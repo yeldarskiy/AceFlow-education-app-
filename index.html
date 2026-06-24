@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AceFlow</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --ink: #1a1d23;
+  --ink-2: #4a5568;
+  --ink-3: #94a3b8;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --primary-lt: #eff6ff;
+  --primary-dk: #1d4ed8;
+  --cyan: #06b6d4;
+  --purple: #7c3aed;
+  --green: #16a34a;
+  --green-lt: #f0fdf4;
+  --gold: #eab308;
+  --gold-lt: #fefce8;
+  --red: #dc2626;
+  --red-lt: #fef2f2;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,.1);
+  --nav-w: 240px;
+  --top-h: 56px;
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
+a { text-decoration: none; color: inherit; }
+button { font-family: var(--font); cursor: pointer; border: none; background: none; }
+input, select, textarea { font-family: var(--font); }
+ul, ol { list-style: none; }
+
+/* ── APP LAYOUT ── */
+.app { display: flex; min-height: 100vh; }
+.app.auth-mode { display: block; }
+.app.auth-mode .nav, .app.auth-mode .main { display: none; }
+.app.auth-mode .auth-page { display: flex; }
+
+/* ── AUTH PAGE ── */
+.auth-page {
+  display: none; min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.auth-box {
+  background: var(--card); border-radius: 16px; padding: 40px;
+  width: 420px; max-width: 100%; box-shadow: var(--shadow-lg);
+}
+.auth-logo { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 24px; }
+.auth-logo svg { width: 40px; height: 40px; }
+.auth-logo-text { font-size: 1.5rem; font-weight: 800; }
+.auth-logo-text span { color: var(--primary); }
+.auth-logo-text em { font-style: normal; color: var(--cyan); }
+.auth-title { text-align: center; font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+.auth-sub { text-align: center; font-size: .85rem; color: var(--ink-3); margin-bottom: 24px; }
+.auth-field { margin-bottom: 14px; }
+.auth-label { font-size: .82rem; font-weight: 600; color: var(--ink-2); margin-bottom: 5px; display: block; }
+.auth-input {
+  width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 10px 12px; font-size: .9rem; outline: none;
+  transition: border-color .15s;
+}
+.auth-input:focus { border-color: var(--primary); }
+.auth-btn {
+  width: 100%; padding: 11px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--cyan));
+  color: #fff; font-size: .95rem; font-weight: 600;
+  margin-top: 8px; transition: opacity .15s;
+}
+.auth-btn:hover { opacity: .9; }
+.auth-btn:disabled { opacity: .5; cursor: not-allowed; }
+.auth-divider { text-align: center; color: var(--ink-3); font-size: .82rem; margin: 18px 0; }
+.auth-link { text-align: center; font-size: .85rem; color: var(--ink-3); margin-top: 16px; }
+.auth-link a { color: var(--primary); font-weight: 600; cursor: pointer; }
+.auth-lang { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+.auth-lang button {
+  padding: 4px 10px; border-radius: 4px; font-size: .78rem; font-weight: 600;
+  border: 1px solid var(--border); color: var(--ink-3); transition: all .15s;
+}
+.auth-lang button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* ── SIDEBAR ── */
+.nav {
+  width: var(--nav-w); background: #0f172a; color: #fff;
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+  transition: transform .25s ease;
+}
+.nav-logo { padding: 16px 16px 14px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 10px; }
+.nav-logo svg { width: 32px; height: 32px; flex-shrink: 0; }
+.nav-brand { font-size: 1.15rem; font-weight: 800; }
+.nav-brand span { color: #60a5fa; }
+.nav-brand em { font-style: normal; color: var(--cyan); }
+.nav-section { padding: 10px 8px 4px; }
+.nav-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.3); padding: 0 12px 6px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px;
+  font-size: .85rem; font-weight: 500; color: rgba(255,255,255,.6);
+  cursor: pointer; transition: all .15s; margin-bottom: 2px;
+}
+.nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+.nav-item.active { background: var(--primary); color: #fff; }
+.nav-item .ic { width: 18px; text-align: center; flex-shrink: 0; opacity: .7; font-size: .9rem; }
+.nav-item.active .ic { opacity: 1; }
+.nav-badge { margin-left: auto; background: var(--cyan); color: #fff; font-size: .65rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+.nav-footer { margin-top: auto; padding: 14px; border-top: 1px solid rgba(255,255,255,.08); }
+.nav-user { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.nav-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--cyan));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .85rem; color: #fff; flex-shrink: 0;
+}
+.nav-uname { font-size: .85rem; font-weight: 600; }
+.nav-ulevel { font-size: .72rem; color: rgba(255,255,255,.4); }
+
+/* ── MAIN ── */
+.main { flex: 1; margin-left: var(--nav-w); display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ── TOPBAR ── */
+.topbar {
+  height: var(--top-h); background: var(--card); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 24px; gap: 12px;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-menu { display: none; font-size: 1.2rem; cursor: pointer; color: var(--ink-2); }
+.topbar-title { font-size: 1rem; font-weight: 700; flex: 1; }
+.topbar-search {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 12px; width: 220px;
+}
+.topbar-search input { border: none; background: none; outline: none; font-size: .82rem; width: 100%; color: var(--ink); }
+.xp-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--gold-lt); border: 1px solid #fde047;
+  border-radius: 20px; padding: 4px 10px; font-size: .78rem; font-weight: 600; color: #854d0e;
+}
+.streak-pill {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--red-lt); border: 1px solid #fca5a5;
+  border-radius: 20px; padding: 4px 10px; font-size: .78rem; font-weight: 600; color: var(--red);
+}
+.lang-switch {
+  display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+}
+.lang-btn {
+  padding: 4px 8px; font-size: .72rem; font-weight: 600;
+  color: var(--ink-3); border-right: 1px solid var(--border); transition: all .12s;
+}
+.lang-btn:last-child { border-right: none; }
+.lang-btn.active { background: var(--primary); color: #fff; }
+
+/* ── PAGE ── */
+.page { display: none; flex: 1; flex-direction: column; }
+.page.active { display: flex; }
+.content { padding: 24px; flex: 1; max-width: 1100px; width: 100%; }
+
+/* ── GRID ── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+/* ── CARD ── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+.card-sm { padding: 14px 16px; }
+.card-title { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); font-weight: 600; margin-bottom: 6px; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 8px;
+  font-size: .85rem; font-weight: 600; transition: all .15s; cursor: pointer;
+}
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dk); }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--ink-2); }
+.btn-ghost:hover { background: var(--bg); }
+.btn-gold { background: var(--gold); color: var(--ink); }
+.btn-sm { padding: 5px 10px; font-size: .78rem; }
+
+/* ── BADGE ── */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: .72rem; font-weight: 600; }
+.badge-blue { background: var(--primary-lt); color: var(--primary); }
+.badge-green { background: var(--green-lt); color: var(--green); }
+.badge-gold { background: var(--gold-lt); color: #854d0e; }
+.badge-red { background: var(--red-lt); color: var(--red); }
+
+/* ── PROGRESS ── */
+.prog-track { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 99px; background: var(--primary); transition: width .5s ease; }
+.prog-fill.green { background: var(--green); }
+.prog-fill.gold { background: var(--gold); }
+.prog-fill.red { background: var(--red); }
+
+/* ── SECTION HEAD ── */
+.sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.sec-head h2 { font-size: 1.1rem; font-weight: 700; }
+
+/* ── DIVIDER ── */
+hr.div { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* ── MODAL ── */
+.modal-bg {
+  display: none; position: fixed; inset: 0; background: rgba(15,23,42,.5);
+  z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(2px);
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: var(--card); border-radius: 14px; padding: 24px;
+  width: 480px; max-width: 92vw; box-shadow: var(--shadow-lg);
+  animation: pop .2s ease;
+}
+@keyframes pop { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal-head h3 { font-size: 1.05rem; font-weight: 700; }
+.modal-x { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--ink-3); font-size: 1rem; }
+.modal-x:hover { background: var(--bg); }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+.field { margin-bottom: 12px; }
+.field label { font-size: .82rem; font-weight: 600; color: var(--ink-2); display: block; margin-bottom: 4px; }
+.field input, .field select, .field textarea {
+  width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 8px 12px; font-size: .88rem; outline: none; transition: border-color .15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--primary); }
+
+/* ── TOAST ── */
+.toast-box { position: fixed; bottom: 20px; right: 20px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 8px;
+  font-size: .85rem; font-weight: 500; box-shadow: var(--shadow-lg);
+  animation: slideIn .25s ease; max-width: 320px;
+}
+@keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
+
+/* ── PAGINATION ── */
+.pagination { display: flex; align-items: center; gap: 4px; justify-content: center; margin-top: 20px; }
+.pg-btn {
+  min-width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  font-size: .82rem; font-weight: 600; border: 1px solid var(--border); color: var(--ink-2); transition: all .15s;
+}
+.pg-btn:hover { background: var(--bg); }
+.pg-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.pg-btn:disabled { opacity: .3; cursor: default; }
+
+/* ═══ DASHBOARD ═══ */
+.dash-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+  border-radius: 14px; padding: 24px 28px; color: #fff; margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.dash-hero h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; }
+.dash-hero p { color: rgba(255,255,255,.55); font-size: .88rem; }
+.dash-xp { text-align: right; }
+.dash-xp .big { font-size: 2.2rem; font-weight: 800; color: var(--gold); }
+.dash-xp .lbl { font-size: .72rem; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .05em; }
+.lvl-bar { margin-top: 6px; }
+.lvl-track { height: 4px; background: rgba(255,255,255,.12); border-radius: 99px; width: 140px; }
+.lvl-fill { height: 100%; border-radius: 99px; background: var(--gold); width: 68%; }
+.lvl-lbl { font-size: .7rem; color: rgba(255,255,255,.35); margin-top: 3px; }
+
+.stat-card .stat-icon { font-size: 1.3rem; margin-bottom: 8px; }
+.stat-card .stat-num { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+.stat-card .stat-lbl { font-size: .75rem; color: var(--ink-3); margin-top: 3px; }
+.stat-card .stat-ch { font-size: .72rem; font-weight: 600; margin-top: 4px; }
+.stat-ch.up { color: var(--green); }
+
+.today-plan { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.today-head { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.today-head h3 { font-size: .95rem; font-weight: 700; }
+.task-item {
+  display: flex; align-items: center; gap: 10px; padding: 11px 16px;
+  border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s;
+}
+.task-item:last-child { border-bottom: none; }
+.task-item:hover { background: var(--bg); }
+.task-chk {
+  width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 50%;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; transition: all .15s;
+}
+.task-chk.done { border-color: var(--green); background: var(--green); color: #fff; }
+.task-name { font-size: .85rem; font-weight: 500; }
+.task-name.done { text-decoration: line-through; color: var(--ink-3); }
+.task-meta { font-size: .75rem; color: var(--ink-3); margin-top: 1px; }
+.task-xp { font-size: .75rem; font-weight: 700; color: var(--primary); margin-left: auto; flex-shrink: 0; }
+
+/* ═══ DOCUMENTS ═══ */
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: 12px; padding: 32px;
+  text-align: center; cursor: pointer; transition: border-color .15s; margin-bottom: 20px;
+}
+.upload-zone:hover { border-color: var(--primary); }
+.upload-icon { font-size: 2rem; margin-bottom: 8px; color: var(--primary); }
+.upload-text { font-size: .9rem; font-weight: 500; margin-bottom: 4px; }
+.upload-sub { font-size: .78rem; color: var(--ink-3); }
+
+.doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.doc-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; cursor: pointer; transition: box-shadow .15s, transform .15s;
+}
+.doc-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.doc-thumb { height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; background: var(--bg); }
+.doc-body { padding: 12px; }
+.doc-name { font-weight: 600; font-size: .85rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doc-meta { font-size: .72rem; color: var(--ink-3); margin-bottom: 8px; }
+.doc-tags { display: flex; gap: 4px; }
+
+/* ═══ TESTS ═══ */
+.tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+.tab {
+  padding: 8px 16px; font-size: .85rem; font-weight: 600; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -2px; color: var(--ink-3); transition: all .15s;
+}
+.tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+.test-list { display: flex; flex-direction: column; gap: 8px; }
+.test-row {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: box-shadow .15s;
+}
+.test-row:hover { box-shadow: var(--shadow-md); }
+.test-ic { font-size: 1.2rem; width: 36px; height: 36px; border-radius: 8px; background: var(--primary-lt); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--primary); }
+.test-info { flex: 1; }
+.test-name { font-weight: 600; font-size: .88rem; margin-bottom: 3px; }
+.test-meta { font-size: .75rem; color: var(--ink-3); display: flex; gap: 8px; flex-wrap: wrap; }
+.test-score { text-align: right; flex-shrink: 0; }
+.test-score-val { font-size: 1.1rem; font-weight: 800; }
+.test-score-val.good { color: var(--green); }
+.test-score-val.mid { color: var(--gold); }
+.test-score-val.bad { color: var(--red); }
+.test-score-lbl { font-size: .7rem; color: var(--ink-3); }
+
+/* ═══ QUIZ ═══ */
+.quiz-view { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 150; flex-direction: column; }
+.quiz-view.open { display: flex; }
+.quiz-top { background: var(--card); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
+.quiz-top h2 { font-size: 1rem; font-weight: 700; flex: 1; }
+.quiz-timer { font-family: var(--mono); font-size: .9rem; font-weight: 600; color: var(--primary); background: var(--primary-lt); padding: 4px 10px; border-radius: 6px; }
+.quiz-prog { height: 3px; background: var(--border); }
+.quiz-prog-fill { height: 100%; background: var(--primary); transition: width .3s; }
+.quiz-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 32px 20px; }
+.quiz-q {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 32px; max-width: 640px; width: 100%; box-shadow: var(--shadow);
+}
+.quiz-q-num { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); margin-bottom: 8px; }
+.quiz-q-text { font-size: 1.15rem; font-weight: 600; line-height: 1.4; margin-bottom: 24px; }
+.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt {
+  border: 2px solid var(--border); border-radius: 10px; padding: 12px 16px;
+  cursor: pointer; font-size: .88rem; transition: all .15s;
+  display: flex; align-items: center; gap: 10px;
+}
+.quiz-opt:hover { border-color: var(--primary); background: var(--primary-lt); }
+.quiz-opt.correct { border-color: var(--green); background: var(--green-lt); }
+.quiz-opt.wrong { border-color: var(--red); background: var(--red-lt); }
+.quiz-opt-lbl { width: 24px; height: 24px; border-radius: 6px; border: 2px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
+.quiz-explain { margin-top: 14px; padding: 10px 14px; background: var(--bg); border-radius: 8px; border-left: 3px solid var(--primary); font-size: .82rem; color: var(--ink-2); display: none; }
+.quiz-explain.show { display: block; }
+.quiz-foot { padding: 16px 32px; border-top: 1px solid var(--border); background: var(--card); display: flex; justify-content: space-between; align-items: center; }
+
+.results-view { text-align: center; max-width: 400px; margin: 0 auto; }
+.results-ring {
+  width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.results-ring::before { content: ''; width: 92px; height: 92px; background: var(--bg); border-radius: 50%; position: absolute; }
+.results-inner { position: relative; z-index: 1; text-align: center; }
+.results-val { font-size: 1.8rem; font-weight: 800; }
+.results-lbl { font-size: .7rem; color: var(--ink-3); }
+
+/* ═══ FLASHCARDS ═══ */
+.fc-session { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.fc-scene { width: 100%; max-width: 520px; perspective: 1200px; }
+.fc-inner {
+  width: 100%; height: 280px; position: relative;
+  transform-style: preserve-3d; transition: transform .5s ease; cursor: pointer;
+}
+.fc-inner.flipped { transform: rotateY(180deg); }
+.fc-face {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  flex-direction: column; padding: 28px; box-shadow: var(--shadow-md); border: 1px solid var(--border);
+}
+.fc-front { background: var(--card); }
+.fc-back { background: linear-gradient(135deg, var(--primary), var(--cyan)); color: #fff; transform: rotateY(180deg); }
+.fc-face .hint { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; opacity: .5; margin-bottom: 12px; }
+.fc-face .txt { font-size: 1.2rem; font-weight: 600; text-align: center; line-height: 1.35; }
+.fc-controls { display: flex; gap: 10px; }
+.fc-btn { padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: .85rem; border: 2px solid var(--border); transition: all .15s; }
+.fc-btn.hard { color: var(--red); border-color: var(--red); }
+.fc-btn.hard:hover { background: var(--red-lt); }
+.fc-btn.ok { color: var(--gold); border-color: var(--gold); }
+.fc-btn.ok:hover { background: var(--gold-lt); }
+.fc-btn.easy { color: var(--green); border-color: var(--green); }
+.fc-btn.easy:hover { background: var(--green-lt); }
+
+.fc-deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.fc-deck {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; cursor: pointer; transition: all .15s;
+}
+.fc-deck:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.fc-deck-ic { font-size: 1.6rem; margin-bottom: 8px; }
+.fc-deck-name { font-weight: 600; font-size: .88rem; margin-bottom: 3px; }
+.fc-deck-count { font-size: .75rem; color: var(--ink-3); margin-bottom: 8px; }
+
+/* ═══ STUDY PLAN ═══ */
+.plan-hero {
+  background: linear-gradient(135deg, #0a2540, #1a4f8a);
+  border-radius: 14px; padding: 24px 28px; color: #fff; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 28px;
+}
+.plan-count { text-align: center; }
+.plan-count .big { font-size: 2.8rem; font-weight: 800; color: var(--gold); line-height: 1; }
+.plan-count .lbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: rgba(255,255,255,.4); margin-top: 3px; }
+.plan-info { flex: 1; }
+.plan-info h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 3px; }
+.plan-info p { color: rgba(255,255,255,.55); font-size: .85rem; }
+
+.plan-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 20px; }
+.plan-day {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 6px; text-align: center; cursor: pointer; transition: border-color .15s;
+}
+.plan-day.today { border-color: var(--primary); background: var(--primary-lt); }
+.plan-day.done { border-color: var(--green); }
+.plan-day .dn { font-size: .65rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-3); }
+.plan-day .dd { font-size: 1.05rem; font-weight: 700; margin: 3px 0; }
+.plan-day .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); margin: 0 auto; }
+.plan-day.today .dot { background: var(--primary); }
+.plan-day.done .dot { background: var(--green); }
+
+.topic-list { display: flex; flex-direction: column; gap: 8px; }
+.topic-row {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+}
+.topic-ic { font-size: 1.1rem; width: 34px; height: 34px; border-radius: 8px; background: var(--bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.topic-name { font-weight: 600; font-size: .88rem; margin-bottom: 2px; }
+.topic-meta { font-size: .75rem; color: var(--ink-3); }
+.topic-prog { width: 80px; }
+.topic-pct { font-size: .78rem; font-weight: 700; color: var(--primary); text-align: right; margin-bottom: 3px; }
+
+/* ═══ GOALS ═══ */
+.goals-list { display: flex; flex-direction: column; gap: 8px; }
+.goal-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px;
+  transition: box-shadow .15s;
+}
+.goal-card:hover { box-shadow: var(--shadow); }
+.goal-chk {
+  width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 6px;
+  flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s; font-size: .65rem;
+}
+.goal-chk.done { background: var(--green); border-color: var(--green); color: #fff; }
+.goal-body { flex: 1; }
+.goal-title { font-weight: 600; font-size: .9rem; margin-bottom: 2px; }
+.goal-title.done { text-decoration: line-through; color: var(--ink-3); }
+.goal-info { font-size: .75rem; color: var(--ink-3); }
+.goal-right { text-align: right; flex-shrink: 0; }
+.goal-xp { font-size: .78rem; font-weight: 700; color: var(--gold); }
+.goal-due { font-size: .72rem; color: var(--ink-3); }
+
+/* ═══ ACHIEVEMENTS ═══ */
+.ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.ach-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px 14px; text-align: center; transition: all .15s; cursor: pointer;
+}
+.ach-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.ach-card.locked { opacity: .4; filter: grayscale(1); }
+.ach-icon { font-size: 2rem; margin-bottom: 8px; }
+.ach-name { font-weight: 600; font-size: .82rem; margin-bottom: 3px; }
+.ach-desc { font-size: .72rem; color: var(--ink-3); }
+.ach-xp { font-size: .75rem; font-weight: 700; color: var(--gold); margin-top: 6px; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+  .nav { transform: translateX(-100%); }
+  .nav.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .topbar-menu { display: block; }
+  .topbar-search { display: none; }
+  .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  .content { padding: 16px; }
+  .dash-hero { flex-direction: column; text-align: center; }
+  .dash-xp { text-align: center; margin-top: 16px; }
+  .plan-hero { flex-direction: column; text-align: center; }
+  .plan-week { grid-template-columns: repeat(7, 1fr); }
+  .quiz-q { padding: 20px; }
+}
+@media (max-width: 480px) {
+  .plan-week { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="toast-box" id="toasts"></div>
+<div class="app auth-mode" id="app">
+
+<!-- AUTH PAGE -->
+<div class="auth-page" id="auth-page">
+  <div class="auth-box">
+    <div class="auth-lang">
+      <button class="active" onclick="setLang('en')">EN</button>
+      <button onclick="setLang('ru')">RU</button>
+      <button onclick="setLang('kz')">KZ</button>
+    </div>
+    <div class="auth-logo">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="40" height="40" rx="10" fill="#0f172a"/>
+        <path d="M14 32L24 14L34 32" stroke="url(#ag)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="18" y1="26" x2="30" y2="26" stroke="url(#ag)" stroke-width="3" stroke-linecap="round"/>
+        <defs><linearGradient id="ag" x1="14" y1="14" x2="34" y2="32"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+      </svg>
+      <div class="auth-logo-text"><span>Ace</span><em>Flow</em></div>
+    </div>
+    <div class="auth-title" data-i18n="auth_title">Sign in to your account</div>
+    <div class="auth-sub" data-i18n="auth_sub">Prepare for any exam with AI</div>
+    <div id="auth-form">
+      <div class="auth-field">
+        <label class="auth-label" data-i18n="email">Email</label>
+        <input class="auth-input" type="email" id="login-email" placeholder="name@example.com" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label" data-i18n="password">Password</label>
+        <input class="auth-input" type="password" id="login-pass" placeholder="********" autocomplete="current-password">
+      </div>
+      <button class="auth-btn" id="login-btn" onclick="doLogin()" data-i18n="sign_in">Sign In</button>
+      <div class="auth-divider" data-i18n="or">or</div>
+      <button class="auth-btn" style="background:var(--card);color:var(--ink);border:1px solid var(--border);" onclick="showRegister()" data-i18n="create_account">Create Account</button>
+    </div>
+    <div id="register-form" style="display:none;">
+      <div class="auth-field">
+        <label class="auth-label" data-i18n="full_name">Full Name</label>
+        <input class="auth-input" type="text" id="reg-name" placeholder="Yeldar Bazarbay" autocomplete="name">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label" data-i18n="email">Email</label>
+        <input class="auth-input" type="email" id="reg-email" placeholder="name@example.com" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label" data-i18n="password">Password</label>
+        <input class="auth-input" type="password" id="reg-pass" placeholder="********">
+      </div>
+      <button class="auth-btn" onclick="doRegister()" data-i18n="create_account">Create Account</button>
+      <div class="auth-link"><a onclick="showLogin()" data-i18n="back_to_login">Back to login</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<nav class="nav" id="nav">
+  <div class="nav-logo">
+    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="40" height="40" rx="10" fill="#1e293b"/>
+      <path d="M14 32L24 14L34 32" stroke="url(#ng)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="18" y1="26" x2="30" y2="26" stroke="url(#ng)" stroke-width="3" stroke-linecap="round"/>
+      <defs><linearGradient id="ng" x1="14" y1="14" x2="34" y2="32"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+    </svg>
+    <div class="nav-brand"><span>Ace</span><em>Flow</em></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label" data-i18n="nav_overview">Overview</div>
+    <div class="nav-item active" onclick="goPage('dashboard')"><span class="ic">&#9776;</span> <span data-i18n="nav_dashboard">Dashboard</span></div>
+    <div class="nav-item" onclick="goPage('studyplan')"><span class="ic">&#128197;</span> <span data-i18n="nav_plan">Study Plan</span></div>
+    <div class="nav-item" onclick="goPage('goals')"><span class="ic">&#10003;</span> <span data-i18n="nav_goals">Goals</span></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label" data-i18n="nav_tools">Study Tools</div>
+    <div class="nav-item" onclick="goPage('documents')"><span class="ic">&#128194;</span> <span data-i18n="nav_docs">Documents</span></div>
+    <div class="nav-item" onclick="goPage('tests')"><span class="ic">&#9998;</span> <span data-i18n="nav_tests">Tests</span><span class="nav-badge">3</span></div>
+    <div class="nav-item" onclick="goPage('flashcards')"><span class="ic">&#9830;</span> <span data-i18n="nav_cards">Flashcards</span></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label" data-i18n="nav_progress">Progress</div>
+    <div class="nav-item" onclick="goPage('achievements')"><span class="ic">&#9733;</span> <span data-i18n="nav_ach">Achievements</span></div>
+  </div>
+  <div class="nav-footer">
+    <div class="nav-user" onclick="doLogout()">
+      <div class="nav-avatar" id="nav-avatar">Y</div>
+      <div>
+        <div class="nav-uname" id="nav-uname">Yeldar</div>
+        <div class="nav-ulevel">Level 7</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+<header class="topbar">
+  <div class="topbar-menu" onclick="toggleNav()">&#9776;</div>
+  <div class="topbar-title" id="topbar-title" data-i18n="nav_dashboard">Dashboard</div>
+  <div class="topbar-search"><span style="color:var(--ink-3)">&#128269;</span><input type="text" data-i18n-placeholder="search_placeholder" placeholder="Search..."></div>
+  <div class="xp-pill">&#9889; 3,840 XP</div>
+  <div class="streak-pill">&#128293; 12</div>
+  <div class="lang-switch">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('ru')">RU</button>
+    <button class="lang-btn" onclick="setLang('kz')">KZ</button>
+  </div>
+</header>
+
+<div class="page active" id="page-dashboard">
+  <div class="content">
+    <div class="dash-hero">
+      <div>
+        <h1 id="dash-greeting">Good morning, Yeldar!</h1>
+        <p data-i18n="dash_sub">You have 3 tasks left today. Keep your streak going!</p>
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="btn btn-gold btn-sm" onclick="goPage('tests')" data-i18n="start_test">Start Test</button>
+          <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,.25);" onclick="goPage('studyplan')" data-i18n="view_plan">View Plan</button>
+        </div>
+      </div>
+      <div class="dash-xp">
+        <div class="big">3,840</div>
+        <div class="lbl">XP TOTAL</div>
+        <div class="lvl-bar"><div class="lvl-track"><div class="lvl-fill"></div></div><div class="lvl-lbl">840 / 1,200 XP to Level 8</div></div>
+      </div>
+    </div>
+    <div class="g4" style="margin-bottom:20px;">
+      <div class="card stat-card"><div class="stat-icon">&#128194;</div><div class="stat-num">12</div><div class="stat-lbl" data-i18n="documents">Documents</div><div class="stat-ch up">+2 this week</div></div>
+      <div class="card stat-card"><div class="stat-icon">&#9998;</div><div class="stat-num">47</div><div class="stat-lbl" data-i18n="tests_taken">Tests Taken</div><div class="stat-ch up">+5 this week</div></div>
+      <div class="card stat-card"><div class="stat-icon">&#9830;</div><div class="stat-num">318</div><div class="stat-lbl" data-i18n="flashcards">Flashcards</div><div class="stat-ch up">+24 mastered</div></div>
+      <div class="card stat-card"><div class="stat-icon">&#9733;</div><div class="stat-num">78%</div><div class="stat-lbl" data-i18n="avg_score">Avg. Score</div><div class="stat-ch up">+4% vs last week</div></div>
+    </div>
+    <div class="g2">
+      <div class="today-plan">
+        <div class="today-head"><h3 data-i18n="todays_tasks">Today's Tasks</h3><span class="badge badge-green">2/5</span></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-chk done">&#10003;</div><div style="flex:1"><div class="task-name done">Review Chapter 4</div><div class="task-meta">Macroeconomics &middot; 45 min</div></div><div class="task-xp">+120 XP</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-chk done">&#10003;</div><div style="flex:1"><div class="task-name done">Flashcard review</div><div class="task-meta">Monetary Policy &middot; 20 min</div></div><div class="task-xp">+80 XP</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-chk"></div><div style="flex:1"><div class="task-name">Practice Test - Fiscal Policy</div><div class="task-meta">20 questions &middot; 30 min</div></div><div class="task-xp">+200 XP</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-chk"></div><div style="flex:1"><div class="task-name">Study GDP concepts</div><div class="task-meta">Lecture Notes &middot; 25 min</div></div><div class="task-xp">+100 XP</div></div>
+        <div class="task-item" onclick="toggleTask(this)"><div class="task-chk"></div><div style="flex:1"><div class="task-name">Complete 5-day streak</div><div class="task-meta">Streak challenge</div></div><div class="task-xp">+150 XP</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title" data-i18n="recent_performance">Recent Performance</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;"><div style="flex:1"><div style="font-size:.85rem;font-weight:600;margin-bottom:3px;">Macroeconomics Mock</div><div class="prog-track"><div class="prog-fill green" style="width:85%"></div></div></div><div style="font-weight:800;color:var(--green);font-size:1rem;">85%</div></div>
+          <div style="display:flex;align-items:center;gap:10px;"><div style="flex:1"><div style="font-size:.85rem;font-weight:600;margin-bottom:3px;">Supply & Demand Quiz</div><div class="prog-track"><div class="prog-fill gold" style="width:72%"></div></div></div><div style="font-weight:800;color:var(--gold);font-size:1rem;">72%</div></div>
+          <div style="display:flex;align-items:center;gap:10px;"><div style="flex:1"><div style="font-size:.85rem;font-weight:600;margin-bottom:3px;">Monetary Policy</div><div class="prog-track"><div class="prog-fill" style="width:91%"></div></div></div><div style="font-weight:800;color:var(--primary);font-size:1rem;">91%</div></div>
+          <div style="display:flex;align-items:center;gap:10px;"><div style="flex:1"><div style="font-size:.85rem;font-weight:600;margin-bottom:3px;">Trade & Globalization</div><div class="prog-track"><div class="prog-fill red" style="width:63%"></div></div></div><div style="font-weight:800;color:var(--red);font-size:1rem;">63%</div></div>
+        </div>
+        <hr class="div">
+        <div class="card-title" data-i18n="upcoming_exam">Upcoming Exam</div>
+        <div style="background:var(--bg);border-radius:8px;padding:12px;margin-top:4px;">
+          <div style="font-weight:700;margin-bottom:2px;">IELTS Academic</div>
+          <div style="font-size:.8rem;color:var(--ink-3);margin-bottom:8px;">August 15, 2026 &middot; <strong style="color:var(--red);">53 days</strong></div>
+          <div class="prog-track"><div class="prog-fill" style="width:42%"></div></div>
+          <div style="font-size:.72rem;color:var(--ink-3);margin-top:3px;">42% complete</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-documents">
+  <div class="content">
+    <div class="sec-head"><h2 data-i18n="documents">Documents</h2><button class="btn btn-primary" onclick="openModal('modal-upload')" data-i18n="upload_doc">+ Upload</button></div>
+    <div class="upload-zone" onclick="openModal('modal-upload')">
+      <div class="upload-icon">&#8679;</div>
+      <div class="upload-text" data-i18n="drag_drop">Drag & drop files here, or click to browse</div>
+      <div class="upload-sub">PDF, DOCX, TXT &middot; Max 50 MB</div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(this)">All Files</div>
+      <div class="tab" onclick="switchTab(this)">PDF</div>
+      <div class="tab" onclick="switchTab(this)">Recent</div>
+    </div>
+    <div class="doc-grid">
+      <div class="doc-card" onclick="openModal('modal-docaction')"><div class="doc-thumb">&#128196;</div><div class="doc-body"><div class="doc-name">Macroeconomics.pdf</div><div class="doc-meta">PDF &middot; 4.2 MB &middot; 3 days ago</div><div class="doc-tags"><span class="badge badge-blue">3 Tests</span><span class="badge badge-green">156 Cards</span></div></div></div>
+      <div class="doc-card" onclick="openModal('modal-docaction')"><div class="doc-thumb" style="color:var(--primary)">&#128214;</div><div class="doc-body"><div class="doc-name">Lecture Notes W6.docx</div><div class="doc-meta">DOCX &middot; 820 KB &middot; 5 days ago</div><div class="doc-tags"><span class="badge badge-blue">1 Test</span><span class="badge badge-green">48 Cards</span></div></div></div>
+      <div class="doc-card" onclick="openModal('modal-docaction')"><div class="doc-thumb">&#128196;</div><div class="doc-body"><div class="doc-name">IELTS Reading.pdf</div><div class="doc-meta">PDF &middot; 2.1 MB &middot; 1 week ago</div><div class="doc-tags"><span class="badge badge-blue">5 Tests</span><span class="badge badge-green">74 Cards</span></div></div></div>
+      <div class="doc-card" onclick="openModal('modal-docaction')"><div class="doc-thumb" style="color:var(--ink-3)">&#128203;</div><div class="doc-body"><div class="doc-name">Vocabulary List.txt</div><div class="doc-meta">TXT &middot; 45 KB &middot; 2 weeks ago</div><div class="doc-tags"><span class="badge badge-gold">0 Tests</span><span class="badge badge-green">40 Cards</span></div></div></div>
+      <div class="doc-card" onclick="openModal('modal-docaction')"><div class="doc-thumb">&#128196;</div><div class="doc-body"><div class="doc-name">Trade Policy Slides.pdf</div><div class="doc-meta">PDF &middot; 6.8 MB &middot; 2 weeks ago</div><div class="doc-tags"><span class="badge badge-blue">2 Tests</span><span class="badge badge-green">62 Cards</span></div></div></div>
+      <div class="doc-card" onclick="openModal('modal-docaction')"><div class="doc-thumb" style="color:var(--primary)">&#128214;</div><div class="doc-body"><div class="doc-name">Monetary Policy.docx</div><div class="doc-meta">DOCX &middot; 340 KB &middot; 3 weeks ago</div><div class="doc-tags"><span class="badge badge-blue">1 Test</span><span class="badge badge-green">28 Cards</span></div></div></div>
+    </div>
+    <div class="pagination"><button class="pg-btn" disabled>&laquo;</button><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">3</button><button class="pg-btn">&raquo;</button></div>
+  </div>
+</div>
+
+<div class="page" id="page-tests">
+  <div class="content">
+    <div class="sec-head"><h2 data-i18n="nav_tests">Tests</h2><div style="display:flex;gap:8px;"><button class="btn btn-ghost" onclick="openModal('modal-newtest')" data-i18n="generate_test">Generate Test</button><button class="btn btn-primary" onclick="startQuiz()" data-i18n="start_random">Start Random</button></div></div>
+    <div class="tabs"><div class="tab active" onclick="switchTab(this)" data-i18n="all_tests">All Tests</div><div class="tab" onclick="switchTab(this)" data-i18n="not_started">Not Started</div><div class="tab" onclick="switchTab(this)" data-i18n="completed">Completed</div></div>
+    <div class="test-list">
+      <div class="test-row" onclick="startQuiz()"><div class="test-ic">&#9998;</div><div class="test-info"><div class="test-name">Macroeconomics Mid-term Mock</div><div class="test-meta"><span>20 questions</span><span>30 min</span><span class="badge badge-red">Hard</span></div></div><div class="test-score"><div class="test-score-val good">85%</div><div class="test-score-lbl">Best</div></div></div>
+      <div class="test-row" onclick="startQuiz()"><div class="test-ic">&#9998;</div><div class="test-info"><div class="test-name">Supply & Demand Concepts</div><div class="test-meta"><span>15 questions</span><span>20 min</span><span class="badge badge-gold">Medium</span></div></div><div class="test-score"><div class="test-score-val mid">72%</div><div class="test-score-lbl">Best</div></div></div>
+      <div class="test-row" onclick="startQuiz()"><div class="test-ic">&#9998;</div><div class="test-info"><div class="test-name">Monetary Policy Fundamentals</div><div class="test-meta"><span>10 questions</span><span>15 min</span><span class="badge badge-green">Easy</span></div></div><div class="test-score"><div class="test-score-val good">91%</div><div class="test-score-lbl">Best</div></div></div>
+      <div class="test-row" onclick="startQuiz()"><div class="test-ic">&#9998;</div><div class="test-info"><div class="test-name">Trade & Globalization Quiz</div><div class="test-meta"><span>12 questions</span><span>18 min</span><span class="badge badge-gold">Medium</span></div></div><div class="test-score"><div class="test-score-val bad">63%</div><div class="test-score-lbl">Best</div></div></div>
+      <div class="test-row" onclick="startQuiz()"><div class="test-ic" style="background:var(--green-lt);color:var(--green)">NEW</div><div class="test-info"><div class="test-name">IELTS Reading Practice Set 3</div><div class="test-meta"><span>40 questions</span><span>60 min</span><span class="badge badge-red">Hard</span></div></div><div class="test-score"><div class="test-score-val" style="color:var(--ink-3)">--</div><div class="test-score-lbl">New</div></div></div>
+    </div>
+    <div class="pagination"><button class="pg-btn" disabled>&laquo;</button><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">&raquo;</button></div>
+  </div>
+</div>
+
+<div class="page" id="page-flashcards">
+  <div class="content">
+    <div class="sec-head"><h2 data-i18n="nav_cards">Flashcards</h2></div>
+    <div id="fc-decks-view">
+      <div class="fc-deck-grid">
+        <div class="fc-deck" onclick="startFC()"><div class="fc-deck-ic">&#128218;</div><div class="fc-deck-name">Macroeconomics</div><div class="fc-deck-count">156 cards &middot; 68% mastered</div><div class="prog-track"><div class="prog-fill green" style="width:68%"></div></div></div>
+        <div class="fc-deck" onclick="startFC()"><div class="fc-deck-ic">&#128176;</div><div class="fc-deck-name">Monetary Policy</div><div class="fc-deck-count">48 cards &middot; 42% mastered</div><div class="prog-track"><div class="prog-fill gold" style="width:42%"></div></div></div>
+        <div class="fc-deck" onclick="startFC()"><div class="fc-deck-ic">&#127760;</div><div class="fc-deck-name">Trade & Global</div><div class="fc-deck-count">62 cards &middot; 31% mastered</div><div class="prog-track"><div class="prog-fill" style="width:31%"></div></div></div>
+        <div class="fc-deck" onclick="startFC()"><div class="fc-deck-ic">&#128483;</div><div class="fc-deck-name">IELTS Vocabulary</div><div class="fc-deck-count">74 cards &middot; 55% mastered</div><div class="prog-track"><div class="prog-fill green" style="width:55%"></div></div></div>
+      </div>
+    </div>
+    <div id="fc-session-view" style="display:none;">
+      <div class="fc-session">
+        <div style="font-size:.82rem;color:var(--ink-3);" id="fc-counter">1 / 5</div>
+        <div class="prog-track" style="width:100%;max-width:520px;"><div class="prog-fill" id="fc-prog-fill" style="width:0%"></div></div>
+        <div class="fc-scene">
+          <div class="fc-inner" id="fc-inner" onclick="flipCard()">
+            <div class="fc-face fc-front"><div class="hint" data-i18n="question">QUESTION</div><div class="txt" id="fc-front">What is GDP?</div></div>
+            <div class="fc-face fc-back"><div class="hint" data-i18n="answer">ANSWER</div><div class="txt" id="fc-back">Gross Domestic Product</div></div>
+          </div>
+        </div>
+        <div id="fc-flip-hint" style="font-size:.82rem;color:var(--ink-3);" data-i18n="tap_to_flip">Tap card to flip</div>
+        <div class="fc-controls" id="fc-rating" style="display:none;">
+          <button class="fc-btn hard" onclick="rateCard('hard')" data-i18n="hard">Hard</button>
+          <button class="fc-btn ok" onclick="rateCard('ok')" data-i18n="ok">OK</button>
+          <button class="fc-btn easy" onclick="rateCard('easy')" data-i18n="easy">Easy</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="endFC()" data-i18n="end_session">End Session</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-studyplan">
+  <div class="content">
+    <div class="plan-hero">
+      <div class="plan-count"><div class="big">53</div><div class="lbl" data-i18n="days_left">DAYS LEFT</div></div>
+      <div class="plan-info">
+        <h2>IELTS Academic</h2>
+        <p>August 15, 2026</p>
+        <div style="margin-top:10px;"><div style="font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:3px;">Overall progress</div><div style="height:5px;background:rgba(255,255,255,.12);border-radius:99px;"><div style="height:100%;border-radius:99px;background:var(--gold);width:42%"></div></div></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,.25);" onclick="openModal('modal-newplan')" data-i18n="new_plan">+ New Plan</button>
+    </div>
+    <div class="plan-week">
+      <div class="plan-day done"><div class="dn">Mon</div><div class="dd">17</div><div class="dot"></div></div>
+      <div class="plan-day done"><div class="dn">Tue</div><div class="dd">18</div><div class="dot"></div></div>
+      <div class="plan-day done"><div class="dn">Wed</div><div class="dd">19</div><div class="dot"></div></div>
+      <div class="plan-day done"><div class="dn">Thu</div><div class="dd">20</div><div class="dot"></div></div>
+      <div class="plan-day done"><div class="dn">Fri</div><div class="dd">21</div><div class="dot"></div></div>
+      <div class="plan-day done"><div class="dn">Sat</div><div class="dd">22</div><div class="dot"></div></div>
+      <div class="plan-day today"><div class="dn">Sun</div><div class="dd">23</div><div class="dot"></div></div>
+    </div>
+    <div class="sec-head"><h2 data-i18n="todays_topics">Today's Topics</h2></div>
+    <div class="topic-list">
+      <div class="topic-row"><div class="topic-ic">&#128214;</div><div style="flex:1"><div class="topic-name">Reading Comprehension</div><div class="topic-meta">3 passages &middot; 45 min</div></div><div class="topic-prog"><div class="topic-pct">75%</div><div class="prog-track"><div class="prog-fill green" style="width:75%"></div></div></div></div>
+      <div class="topic-row"><div class="topic-ic">&#9997;</div><div style="flex:1"><div class="topic-name">Writing Task 2</div><div class="topic-meta">Essay practice &middot; 40 min</div></div><div class="topic-prog"><div class="topic-pct">45%</div><div class="prog-track"><div class="prog-fill gold" style="width:45%"></div></div></div></div>
+      <div class="topic-row"><div class="topic-ic">&#127911;</div><div style="flex:1"><div class="topic-name">Listening Section</div><div class="topic-meta">2 audio sets &middot; 30 min</div></div><div class="topic-prog"><div class="topic-pct">60%</div><div class="prog-track"><div class="prog-fill" style="width:60%"></div></div></div></div>
+      <div class="topic-row"><div class="topic-ic">&#128483;</div><div style="flex:1"><div class="topic-name">Vocabulary Review</div><div class="topic-meta">50 words &middot; 20 min</div></div><div class="topic-prog"><div class="topic-pct">30%</div><div class="prog-track"><div class="prog-fill red" style="width:30%"></div></div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-goals">
+  <div class="content">
+    <div class="sec-head"><h2 data-i18n="nav_goals">Goals</h2><button class="btn btn-primary btn-sm" onclick="openModal('modal-goal')" data-i18n="add_goal">+ Add Goal</button></div>
+    <div class="goals-list">
+      <div class="goal-card"><div class="goal-chk done" onclick="toggleGoal(this)">&#10003;</div><div class="goal-body"><div class="goal-title done">Complete 10 practice tests</div><div class="goal-info">8/10 completed</div></div><div class="goal-right"><div class="goal-xp">+500 XP</div><div class="goal-due">Jul 1</div></div></div>
+      <div class="goal-card"><div class="goal-chk" onclick="toggleGoal(this)"></div><div class="goal-body"><div class="goal-title">Master 200 flashcards</div><div class="goal-info">156/200 mastered</div><div class="prog-track" style="margin-top:6px;"><div class="prog-fill green" style="width:78%"></div></div></div><div class="goal-right"><div class="goal-xp">+300 XP</div><div class="goal-due">Jul 10</div></div></div>
+      <div class="goal-card"><div class="goal-chk" onclick="toggleGoal(this)"></div><div class="goal-body"><div class="goal-title">Reach IELTS Band 7.5+</div><div class="goal-info">Current mock: 6.5</div></div><div class="goal-right"><div class="goal-xp">+1000 XP</div><div class="goal-due">Aug 15</div></div></div>
+      <div class="goal-card"><div class="goal-chk" onclick="toggleGoal(this)"></div><div class="goal-body"><div class="goal-title">30-day study streak</div><div class="goal-info">12/30 days</div><div class="prog-track" style="margin-top:6px;"><div class="prog-fill gold" style="width:40%"></div></div></div><div class="goal-right"><div class="goal-xp">+800 XP</div><div class="goal-due">Jul 20</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-achievements">
+  <div class="content">
+    <div class="sec-head"><h2 data-i18n="nav_ach">Achievements</h2><span class="badge badge-gold">7 / 15</span></div>
+    <div class="ach-grid">
+      <div class="ach-card"><div class="ach-icon">&#128293;</div><div class="ach-name">7-Day Streak</div><div class="ach-desc">Study 7 days in a row</div><div class="ach-xp">+100 XP</div></div>
+      <div class="ach-card"><div class="ach-icon">&#9889;</div><div class="ach-name">Speed Demon</div><div class="ach-desc">Score 100% under 5 min</div><div class="ach-xp">+200 XP</div></div>
+      <div class="ach-card"><div class="ach-icon">&#128218;</div><div class="ach-name">Bookworm</div><div class="ach-desc">Upload 10 documents</div><div class="ach-xp">+150 XP</div></div>
+      <div class="ach-card"><div class="ach-icon">&#127942;</div><div class="ach-name">First Perfect</div><div class="ach-desc">Score 100% on any test</div><div class="ach-xp">+300 XP</div></div>
+      <div class="ach-card"><div class="ach-icon">&#128170;</div><div class="ach-name">Card Master</div><div class="ach-desc">Master 100 flashcards</div><div class="ach-xp">+250 XP</div></div>
+      <div class="ach-card"><div class="ach-icon">&#127775;</div><div class="ach-name">Night Owl</div><div class="ach-desc">Study after 11 PM</div><div class="ach-xp">+50 XP</div></div>
+      <div class="ach-card"><div class="ach-icon">&#9728;&#65039;</div><div class="ach-name">Early Bird</div><div class="ach-desc">Study before 7 AM</div><div class="ach-xp">+50 XP</div></div>
+      <div class="ach-card locked"><div class="ach-icon">&#128142;</div><div class="ach-name">30-Day Streak</div><div class="ach-desc">Study 30 days in a row</div><div class="ach-xp">+500 XP</div></div>
+      <div class="ach-card locked"><div class="ach-icon">&#128640;</div><div class="ach-name">Test Machine</div><div class="ach-desc">Complete 50 tests</div><div class="ach-xp">+400 XP</div></div>
+      <div class="ach-card locked"><div class="ach-icon">&#127919;</div><div class="ach-name">Goal Crusher</div><div class="ach-desc">Complete 10 goals</div><div class="ach-xp">+350 XP</div></div>
+      <div class="ach-card locked"><div class="ach-icon">&#128081;</div><div class="ach-name">Grand Master</div><div class="ach-desc">Reach Level 20</div><div class="ach-xp">+1000 XP</div></div>
+      <div class="ach-card locked"><div class="ach-icon">&#128640;</div><div class="ach-name">Scholar</div><div class="ach-desc">Master 500 flashcards</div><div class="ach-xp">+800 XP</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="quiz-view" id="quiz-view">
+  <div class="quiz-top"><button class="btn btn-ghost btn-sm" onclick="closeQuiz()">&larr; Back</button><h2>Practice Test</h2><div class="quiz-timer" id="quiz-timer">28:45</div></div>
+  <div class="quiz-prog"><div class="quiz-prog-fill" id="quiz-prog-fill" style="width:0%"></div></div>
+  <div class="quiz-body">
+    <div id="quiz-q-view" style="display:flex;flex-direction:column;align-items:center;width:100%;">
+      <div class="quiz-q">
+        <div class="quiz-q-num" id="quiz-q-num">Question 1 of 5</div>
+        <div class="quiz-q-text" id="quiz-q-text">What does GDP stand for?</div>
+        <div class="quiz-opts" id="quiz-options"></div>
+        <div class="quiz-explain" id="quiz-explain"></div>
+      </div>
+    </div>
+    <div id="quiz-results-view" style="display:none;">
+      <div class="results-view">
+        <div class="results-ring" style="background:conic-gradient(var(--primary) 0% 76%, var(--border) 76%);"><div class="results-inner"><div class="results-val" id="results-score-val">76%</div><div class="results-lbl">Score</div></div></div>
+        <h2 style="margin-bottom:6px;" data-i18n="test_complete">Test Complete!</h2>
+        <p style="color:var(--ink-3);font-size:.88rem;margin-bottom:16px;"><span id="results-correct">0</span> correct, <span id="results-wrong">0</span> incorrect</p>
+        <div style="display:flex;gap:8px;justify-content:center;"><button class="btn btn-primary" onclick="retakeQuiz()" data-i18n="retake">Retake</button><button class="btn btn-ghost" onclick="closeQuiz()" data-i18n="close">Close</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="quiz-foot" id="quiz-footer"><div style="font-size:.85rem;color:var(--ink-3);" data-i18n="select_answer">Select an answer</div><button class="btn btn-primary btn-sm" id="quiz-next-btn" style="display:none;" onclick="nextQuestion()" data-i18n="next">Next &rarr;</button></div>
+</div>
+
+<div class="modal-bg" id="modal-upload"><div class="modal"><div class="modal-head"><h3 data-i18n="upload_doc">Upload Document</h3><button class="modal-x" onclick="closeModal('modal-upload')">&times;</button></div><div class="field"><label data-i18n="file">File</label><input type="file" accept=".pdf,.docx,.txt,.xlsx" id="upload-file"></div><div class="field"><label data-i18n="title">Title</label><input type="text" placeholder="Document title" id="upload-title"></div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('modal-upload')" data-i18n="cancel">Cancel</button><button class="btn btn-primary" onclick="simulateUpload()" data-i18n="upload">Upload</button></div></div></div>
+
+<div class="modal-bg" id="modal-newplan"><div class="modal"><div class="modal-head"><h3 data-i18n="new_plan">New Study Plan</h3><button class="modal-x" onclick="closeModal('modal-newplan')">&times;</button></div><div class="field"><label data-i18n="exam_name">Exam Name</label><input type="text" placeholder="e.g. IELTS, SAT, ENT" id="plan-exam"></div><div class="field"><label data-i18n="exam_date">Exam Date</label><input type="date" id="plan-date"></div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('modal-newplan')" data-i18n="cancel">Cancel</button><button class="btn btn-primary" onclick="createPlan()" data-i18n="create_plan">Create Plan</button></div></div></div>
+
+<div class="modal-bg" id="modal-goal"><div class="modal"><div class="modal-head"><h3 data-i18n="add_goal">Add Goal</h3><button class="modal-x" onclick="closeModal('modal-goal')">&times;</button></div><div class="field"><label data-i18n="goal_title">Goal</label><input type="text" placeholder="e.g. Score 90% on next test" id="goal-input"></div><div class="field"><label data-i18n="deadline">Deadline</label><input type="date" id="goal-date"></div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('modal-goal')" data-i18n="cancel">Cancel</button><button class="btn btn-primary" onclick="addGoal()" data-i18n="add">Add</button></div></div></div>
+
+<div class="modal-bg" id="modal-docaction"><div class="modal"><div class="modal-head"><h3>Macroeconomics.pdf</h3><button class="modal-x" onclick="closeModal('modal-docaction')">&times;</button></div><p style="font-size:.85rem;color:var(--ink-3);margin-bottom:16px;">PDF &middot; 4.2 MB &middot; 3 Tests &middot; 156 Cards</p><div style="display:flex;flex-direction:column;gap:8px;"><button class="btn btn-primary" onclick="closeModal('modal-docaction');goPage('tests');" data-i18n="take_test">Take Test</button><button class="btn btn-ghost" onclick="closeModal('modal-docaction');goPage('flashcards');startFC();" data-i18n="review_cards">Review Cards</button><button class="btn btn-ghost" style="color:var(--red);border-color:var(--red);" onclick="closeModal('modal-docaction');showToast('Document deleted');" data-i18n="delete">Delete</button></div></div></div>
+
+<div class="modal-bg" id="modal-newtest"><div class="modal"><div class="modal-head"><h3 data-i18n="generate_test">Generate Test</h3><button class="modal-x" onclick="closeModal('modal-newtest')">&times;</button></div><div class="field"><label data-i18n="source_doc">Source Document</label><select><option>Macroeconomics.pdf</option><option>Lecture Notes W6.docx</option><option>IELTS Reading.pdf</option></select></div><div class="field"><label data-i18n="num_questions">Number of Questions</label><select><option>10</option><option>20</option><option>30</option><option>50</option></select></div><div class="field"><label data-i18n="difficulty">Difficulty</label><select><option>Easy</option><option selected>Medium</option><option>Hard</option></select></div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('modal-newtest')" data-i18n="cancel">Cancel</button><button class="btn btn-primary" onclick="closeModal('modal-newtest');showToast('AI generating test...');setTimeout(()=>showToast('Test created! 20 questions generated.'),2000);" data-i18n="generate">Generate</button></div></div></div>
+</div></div>
+
+<script>
+/* ═══ i18n ═══ */
+const i18n = {
+  en: {
+    auth_title: "Sign in to your account", auth_sub: "Prepare for any exam with AI", email: "Email", password: "Password",
+    sign_in: "Sign In", or: "or", create_account: "Create Account", full_name: "Full Name", back_to_login: "Back to login",
+    nav_overview: "Overview", nav_dashboard: "Dashboard", nav_plan: "Study Plan", nav_goals: "Goals",
+    nav_tools: "Study Tools", nav_docs: "Documents", nav_tests: "Tests", nav_cards: "Flashcards",
+    nav_progress: "Progress", nav_ach: "Achievements",
+    search_placeholder: "Search documents, tests...",
+    dash_sub: "You have 3 tasks left today. Keep your streak going!",
+    start_test: "Start Test", view_plan: "View Plan",
+    documents: "Documents", tests_taken: "Tests Taken", flashcards: "Flashcards", avg_score: "Avg. Score",
+    todays_tasks: "Today's Tasks", recent_performance: "Recent Performance", upcoming_exam: "Upcoming Exam",
+    upload_doc: "+ Upload", drag_drop: "Drag & drop files here, or click to browse",
+    generate_test: "Generate Test", start_random: "Start Random",
+    all_tests: "All Tests", not_started: "Not Started", completed: "Completed",
+    question: "QUESTION", answer: "ANSWER", tap_to_flip: "Tap card to flip",
+    hard: "Hard", ok: "OK", easy: "Easy", end_session: "End Session",
+    days_left: "DAYS LEFT", new_plan: "+ New Plan", todays_topics: "Today's Topics",
+    add_goal: "+ Add Goal", test_complete: "Test Complete!", retake: "Retake", close: "Close",
+    select_answer: "Select an answer", next: "Next",
+    cancel: "Cancel", upload: "Upload", title: "Title", file: "File",
+    exam_name: "Exam Name", exam_date: "Exam Date", create_plan: "Create Plan",
+    goal_title: "Goal", deadline: "Deadline", add: "Add",
+    source_doc: "Source Document", num_questions: "Number of Questions", difficulty: "Difficulty", generate: "Generate",
+    take_test: "Take Test", review_cards: "Review Cards", delete: "Delete"
+  },
+  ru: {
+    auth_title: "Войдите в аккаунт", auth_sub: "Готовьтесь к любому экзамену с помощью ИИ", email: "Эл. почта", password: "Пароль",
+    sign_in: "Войти", or: "или", create_account: "Создать аккаунт", full_name: "Полное имя", back_to_login: "Назад к входу",
+    nav_overview: "Обзор", nav_dashboard: "Панель", nav_plan: "Учебный план", nav_goals: "Цели",
+    nav_tools: "Инструменты", nav_docs: "Документы", nav_tests: "Тесты", nav_cards: "Флэшкарты",
+    nav_progress: "Прогресс", nav_ach: "Достижения",
+    search_placeholder: "Поиск документов, тестов...",
+    dash_sub: "Осталось 3 задачи на сегодня. Продолжайте серию!",
+    start_test: "Начать тест", view_plan: "Посмотреть план",
+    documents: "Документы", tests_taken: "Тесты пройдены", flashcards: "Флэшкарты", avg_score: "Средний балл",
+    todays_tasks: "Задачи на сегодня", recent_performance: "Последние результаты", upcoming_exam: "Предстоящий экзамен",
+    upload_doc: "+ Загрузить", drag_drop: "Перетащите файлы сюда или нажмите для выбора",
+    generate_test: "Создать тест", start_random: "Случайный тест",
+    all_tests: "Все тесты", not_started: "Не начатые", completed: "Завершённые",
+    question: "ВОПРОС", answer: "ОТВЕТ", tap_to_flip: "Нажмите для переворота",
+    hard: "Сложно", ok: "Нормально", easy: "Легко", end_session: "Завершить",
+    days_left: "ДНЕЙ ОСТАЛОСЬ", new_plan: "+ Новый план", todays_topics: "Темы на сегодня",
+    add_goal: "+ Добавить цель", test_complete: "Тест завершён!", retake: "Пройти заново", close: "Закрыть",
+    select_answer: "Выберите ответ", next: "Далее",
+    cancel: "Отмена", upload: "Загрузить", title: "Название", file: "Файл",
+    exam_name: "Название экзамена", exam_date: "Дата экзамена", create_plan: "Создать план",
+    goal_title: "Цель", deadline: "Дедлайн", add: "Добавить",
+    source_doc: "Исходный документ", num_questions: "Кол-во вопросов", difficulty: "Сложность", generate: "Сгенерировать",
+    take_test: "Пройти тест", review_cards: "Повторить карты", delete: "Удалить"
+  },
+  kz: {
+    auth_title: "Аккаунтқа кіріңіз", auth_sub: "AI көмегімен кез келген емтиханға дайындалыңыз", email: "Эл. пошта", password: "Құпия сөз",
+    sign_in: "Кіру", or: "немесе", create_account: "Аккаунт құру", full_name: "Толық аты-жөні", back_to_login: "Кіруге оралу",
+    nav_overview: "Шолу", nav_dashboard: "Басқару тақтасы", nav_plan: "Оқу жоспары", nav_goals: "Мақсаттар",
+    nav_tools: "Құралдар", nav_docs: "Құжаттар", nav_tests: "Тесттер", nav_cards: "Флэшкарталар",
+    nav_progress: "Прогресс", nav_ach: "Жетістіктер",
+    search_placeholder: "Құжаттар, тесттер іздеу...",
+    dash_sub: "Бүгінге 3 тапсырма қалды. Серияны жалғастырыңыз!",
+    start_test: "Тест бастау", view_plan: "Жоспарды көру",
+    documents: "Құжаттар", tests_taken: "Тесттер өтілді", flashcards: "Флэшкарталар", avg_score: "Орташа балл",
+    todays_tasks: "Бүгінгі тапсырмалар", recent_performance: "Соңғы нәтижелер", upcoming_exam: "Алдағы емтихан",
+    upload_doc: "+ Жүктеу", drag_drop: "Файлдарды осында сүйреңіз немесе басыңыз",
+    generate_test: "Тест жасау", start_random: "Кездейсоқ тест",
+    all_tests: "Барлық тесттер", not_started: "Басталмаған", completed: "Аяқталған",
+    question: "СҰРАҚ", answer: "ЖАУАП", tap_to_flip: "Аудару үшін басыңыз",
+    hard: "Қиын", ok: "Жарайды", easy: "Оңай", end_session: "Аяқтау",
+    days_left: "КҮН ҚАЛДЫ", new_plan: "+ Жаңа жоспар", todays_topics: "Бүгінгі тақырыптар",
+    add_goal: "+ Мақсат қосу", test_complete: "Тест аяқталды!", retake: "Қайта өту", close: "Жабу",
+    select_answer: "Жауапты таңдаңыз", next: "Келесі",
+    cancel: "Болдырмау", upload: "Жүктеу", title: "Атауы", file: "Файл",
+    exam_name: "Емтихан атауы", exam_date: "Емтихан күні", create_plan: "Жоспар құру",
+    goal_title: "Мақсат", deadline: "Мерзімі", add: "Қосу",
+    source_doc: "Бастапқы құжат", num_questions: "Сұрақтар саны", difficulty: "Күрделілік", generate: "Генерациялау",
+    take_test: "Тест өту", review_cards: "Карталарды қайталау", delete: "Жою"
+  }
+};
+
+let currentLang = 'en';
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (i18n[lang][key]) el.textContent = i18n[lang][key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (i18n[lang][key]) el.placeholder = i18n[lang][key];
+  });
+  document.querySelectorAll('.lang-btn, .auth-lang button').forEach(b => {
+    b.classList.toggle('active', b.textContent === lang.toUpperCase());
+  });
+}
+
+/* ═══ XSS Protection ═══ */
+function sanitize(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* ═══ Auth ═══ */
+let formSubmitting = false;
+function doLogin() {
+  if (formSubmitting) return;
+  formSubmitting = true;
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = '...';
+  setTimeout(() => {
+    document.getElementById('app').classList.remove('auth-mode');
+    showToast('Welcome back!');
+    formSubmitting = false;
+    btn.disabled = false;
+  }, 800);
+}
+function doRegister() {
+  if (formSubmitting) return;
+  formSubmitting = true;
+  const name = sanitize(document.getElementById('reg-name').value || 'User');
+  setTimeout(() => {
+    document.getElementById('app').classList.remove('auth-mode');
+    document.getElementById('nav-uname').textContent = name;
+    document.getElementById('nav-avatar').textContent = name.charAt(0).toUpperCase();
+    showToast('Account created!');
+    formSubmitting = false;
+  }, 800);
+}
+function doLogout() {
+  document.getElementById('app').classList.add('auth-mode');
+  showToast('Signed out');
+}
+function showRegister() { document.getElementById('auth-form').style.display='none'; document.getElementById('register-form').style.display='block'; }
+function showLogin() { document.getElementById('register-form').style.display='none'; document.getElementById('auth-form').style.display='block'; }
+
+/* ═══ Navigation ═══ */
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.target.closest('.nav-item')?.classList.add('active');
+  const titles = {dashboard:'nav_dashboard',studyplan:'nav_plan',goals:'nav_goals',documents:'nav_docs',tests:'nav_tests',flashcards:'nav_cards',achievements:'nav_ach'};
+  const key = titles[id] || id;
+  document.getElementById('topbar-title').textContent = i18n[currentLang][key] || id;
+  document.getElementById('nav').classList.remove('open');
+}
+function toggleNav() { document.getElementById('nav').classList.toggle('open'); }
+
+/* ═══ Toast ═══ */
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = sanitize(msg);
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+/* ═══ Modal ═══ */
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-bg').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+/* ═══ Tabs ═══ */
+function switchTab(el) {
+  el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ═══ Tasks ═══ */
+function toggleTask(el) {
+  const chk = el.querySelector('.task-chk');
+  const name = el.querySelector('.task-name');
+  chk.classList.toggle('done');
+  name.classList.toggle('done');
+  if (chk.classList.contains('done')) { chk.innerHTML = '&#10003;'; showToast('Task completed! +XP'); }
+  else { chk.innerHTML = ''; }
+}
+
+/* ═══ Goals ═══ */
+function toggleGoal(el) {
+  el.classList.toggle('done');
+  const title = el.nextElementSibling.querySelector('.goal-title');
+  title.classList.toggle('done');
+  if (el.classList.contains('done')) { el.innerHTML = '&#10003;'; showToast('Goal completed!'); }
+  else { el.innerHTML = ''; }
+}
+function addGoal() {
+  const val = sanitize(document.getElementById('goal-input').value);
+  if (!val) return;
+  closeModal('modal-goal');
+  showToast('Goal added: ' + val);
+  document.getElementById('goal-input').value = '';
+}
+
+/* ═══ Upload ═══ */
+function simulateUpload() {
+  if (formSubmitting) return;
+  formSubmitting = true;
+  closeModal('modal-upload');
+  showToast('Uploading...');
+  setTimeout(() => showToast('AI generating flashcards & tests...'), 1200);
+  setTimeout(() => { showToast('Document ready! 48 cards, 2 tests created.'); formSubmitting = false; }, 3000);
+}
+function createPlan() {
+  const exam = sanitize(document.getElementById('plan-exam').value);
+  if (!exam) return;
+  closeModal('modal-newplan');
+  showToast('Study plan created for ' + exam);
+}
+
+/* ═══ Quiz ═══ */
+const questions = [
+  { q: 'What does GDP stand for and what does it measure?', opts: ['Gross Domestic Product — total monetary value of goods & services', 'General Development Plan — economic growth rate', 'Gross Development Plan — per-capita income', 'Government Debt Policy — national debt level'], correct: 0, explanation: 'GDP measures the total monetary value of all goods and services produced within a country.' },
+  { q: 'Which is an example of fiscal policy?', opts: ['Central bank raising interest rates', 'Government increasing public spending', 'Reducing money supply', 'Lowering exchange rates'], correct: 1, explanation: 'Fiscal policy involves government decisions about spending and taxation.' },
+  { q: 'When demand increases and supply stays constant, what happens to price?', opts: ['Price falls', 'Price stays same', 'Price rises', 'Supply increases proportionally'], correct: 2, explanation: 'When demand increases with constant supply, equilibrium price rises.' },
+  { q: 'What is the primary tool of monetary policy?', opts: ['Tax rates', 'Interest rates', 'Government spending', 'Trade tariffs'], correct: 1, explanation: 'Central banks use interest rates as their primary monetary policy tool.' },
+  { q: 'Which best describes inflation?', opts: ['Decrease in money supply', 'General rise in price level over time', 'Increase in government revenue', 'Fall in unemployment'], correct: 1, explanation: 'Inflation is the general rise in price levels over time.' }
+];
+let cQ=0, answered=false, correctC=0, timerInt;
+
+function startQuiz() {
+  cQ=0; answered=false; correctC=0;
+  document.getElementById('quiz-view').classList.add('open');
+  document.getElementById('quiz-q-view').style.display='flex';
+  document.getElementById('quiz-results-view').style.display='none';
+  document.getElementById('quiz-footer').style.display='flex';
+  renderQ(); startTimer(1725);
+}
+function renderQ() {
+  const q=questions[cQ]; answered=false;
+  document.getElementById('quiz-q-num').textContent='Question '+(cQ+1)+' of '+questions.length;
+  document.getElementById('quiz-q-text').textContent=q.q;
+  document.getElementById('quiz-prog-fill').style.width=(cQ/questions.length*100)+'%';
+  document.getElementById('quiz-explain').classList.remove('show');
+  document.getElementById('quiz-next-btn').style.display='none';
+  const opts=document.getElementById('quiz-options');
+  opts.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const d=document.createElement('div');
+    d.className='quiz-opt';
+    d.innerHTML='<div class="quiz-opt-lbl">'+l+'</div>'+sanitize(q.opts[i]);
+    d.onclick=()=>selectA(i,d);
+    opts.appendChild(d);
+  });
+}
+function selectA(idx,el) {
+  if(answered)return; answered=true;
+  const q=questions[cQ];
+  document.querySelectorAll('.quiz-opt').forEach((o,i)=>{
+    if(i===q.correct)o.classList.add('correct');
+    else if(i===idx&&idx!==q.correct)o.classList.add('wrong');
+  });
+  if(idx===q.correct){correctC++;showToast('Correct! +XP');}
+  else showToast('Incorrect. Review explanation.');
+  document.getElementById('quiz-explain').textContent=q.explanation;
+  document.getElementById('quiz-explain').classList.add('show');
+  document.getElementById('quiz-next-btn').style.display='flex';
+}
+function nextQuestion(){cQ++;if(cQ>=questions.length)showResults();else renderQ();}
+function showResults(){
+  clearInterval(timerInt);
+  document.getElementById('quiz-q-view').style.display='none';
+  document.getElementById('quiz-results-view').style.display='flex';
+  document.getElementById('quiz-footer').style.display='none';
+  const pct=Math.round(correctC/questions.length*100);
+  document.getElementById('results-score-val').textContent=pct+'%';
+  document.getElementById('results-correct').textContent=correctC;
+  document.getElementById('results-wrong').textContent=questions.length-correctC;
+  document.getElementById('quiz-prog-fill').style.width='100%';
+  showToast('Test complete! Score: '+pct+'%');
+}
+function closeQuiz(){clearInterval(timerInt);document.getElementById('quiz-view').classList.remove('open');}
+function retakeQuiz(){startQuiz();}
+let timerSec=0;
+function startTimer(s){
+  clearInterval(timerInt);timerSec=s;updTimer();
+  timerInt=setInterval(()=>{timerSec--;if(timerSec<=0){clearInterval(timerInt);showResults();}updTimer();},1000);
+}
+function updTimer(){
+  const m=Math.floor(timerSec/60),s=timerSec%60;
+  document.getElementById('quiz-timer').textContent=m+':'+s.toString().padStart(2,'0');
+}
+
+/* ═══ Flashcards ═══ */
+const cards=[
+  {front:'What is GDP?',back:'Gross Domestic Product — total monetary value of all goods and services produced in a country.'},
+  {front:'Define inflation.',back:'A general and sustained increase in the price level of goods and services over time.'},
+  {front:'What is monetary policy?',back:'Actions by a central bank to manage money supply and interest rates.'},
+  {front:'What is a trade deficit?',back:'When a country\'s imports exceed its exports over a given period.'},
+  {front:'Define opportunity cost.',back:'The value of the next-best alternative foregone when making a decision.'},
+];
+let fcI=0,fcF=false;
+function startFC(){
+  document.getElementById('fc-decks-view').style.display='none';
+  document.getElementById('fc-session-view').style.display='block';
+  fcI=0;renderFC();
+}
+function endFC(){
+  document.getElementById('fc-session-view').style.display='none';
+  document.getElementById('fc-decks-view').style.display='block';
+}
+function renderFC(){
+  fcF=false;
+  document.getElementById('fc-inner').classList.remove('flipped');
+  document.getElementById('fc-front').textContent=cards[fcI].front;
+  document.getElementById('fc-back').textContent=cards[fcI].back;
+  document.getElementById('fc-counter').textContent=(fcI+1)+' / '+cards.length;
+  document.getElementById('fc-prog-fill').style.width=(fcI/cards.length*100)+'%';
+  document.getElementById('fc-rating').style.display='none';
+  document.getElementById('fc-flip-hint').style.display='block';
+}
+function flipCard(){
+  if(!fcF){document.getElementById('fc-inner').classList.add('flipped');fcF=true;document.getElementById('fc-rating').style.display='flex';document.getElementById('fc-flip-hint').style.display='none';}
+}
+function rateCard(r){
+  const msgs={hard:'Will show again soon',ok:'See you in 2 days',easy:'Mastery building!'};
+  showToast(msgs[r]);fcI++;
+  if(fcI>=cards.length){showToast('Session complete!');endFC();}else renderFC();
+}
+
+/* ═══ Init ═══ */
+setLang('en');
+</script>
+</body>
+</html>
