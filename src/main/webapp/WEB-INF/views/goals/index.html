@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title th:text="#{nav.goals}">Goals - AceFlow</title>
+<link rel="stylesheet" th:href="@{/static/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav(activeMenu='goals')}"></div>
+<div class="main">
+  <div th:replace="~{fragments/topbar :: topbar}"></div>
+  <div class="content">
+    <div class="sec-head">
+      <h2 th:text="#{nav.goals}">Goals</h2>
+      <button class="btn btn-primary btn-sm" onclick="openModal('modal-goal')" th:text="#{goals.add}">+ Add Goal</button>
+    </div>
+
+    <div th:if="${successKey}" class="alert alert-success" th:text="#{${successKey}}"></div>
+
+    <div class="goals-list">
+      <div th:each="goal : ${goals}" class="goal-card">
+        <div class="goal-chk" th:classappend="${goal.completed} ? 'done'">
+          <form th:if="${!goal.completed}" th:action="@{/goals/{id}/complete(id=${goal.goalId})}" method="post" style="display:inline">
+            <button type="submit" class="chk-btn">&#10003;</button>
+          </form>
+          <span th:if="${goal.completed}">&#10003;</span>
+        </div>
+        <div class="goal-body">
+          <div class="goal-title" th:classappend="${goal.completed} ? 'done'" th:text="${goal.title}">Goal</div>
+          <div class="goal-info" th:if="${goal.deadline}" th:text="${goal.deadline}"></div>
+        </div>
+        <div class="goal-right">
+          <div class="goal-xp" th:text="'+' + ${goal.xpReward} + ' XP'">+100 XP</div>
+          <form th:action="@{/goals/{id}/delete(id=${goal.goalId})}" method="post">
+            <button type="submit" class="btn-link-danger">&#128465;</button>
+          </form>
+        </div>
+      </div>
+
+      <div th:if="${#lists.isEmpty(goals)}" class="empty-state">
+        <p th:text="#{goals.add}">No goals yet. Add your first goal!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Goal Modal -->
+<div class="modal-bg" id="modal-goal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 th:text="#{goals.add}">Add Goal</h3>
+      <button class="modal-x" onclick="closeModal('modal-goal')">&times;</button>
+    </div>
+    <form th:action="@{/goals/create}" method="post">
+      <div class="field">
+        <label th:text="#{goals.goal.title}">Goal</label>
+        <input type="text" name="title" class="auth-input" required
+               th:placeholder="#{goals.goal.title}" maxlength="200">
+      </div>
+      <div class="field">
+        <label th:text="#{goals.deadline}">Deadline</label>
+        <input type="date" name="deadline" class="auth-input">
+      </div>
+      <div class="field">
+        <label>Priority</label>
+        <select name="priority" class="auth-input">
+          <option value="LOW">Low</option>
+          <option value="MEDIUM" selected>Medium</option>
+          <option value="HIGH">High</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-goal')" th:text="#{common.cancel}">Cancel</button>
+        <button type="submit" class="btn btn-primary" th:text="#{goals.add.btn}">Add</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script th:src="@{/static/js/main.js}"></script>
+</body>
+</html>
