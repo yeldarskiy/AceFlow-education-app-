@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title th:text="#{auth.create.account}">Register - AceFlow</title>
+<link rel="stylesheet" th:href="@{/static/css/main.css}">
+</head>
+<body class="auth-body">
+<div class="auth-page">
+  <div class="auth-box">
+    <div class="auth-lang">
+      <a th:href="@{/auth/register(lang=en)}" class="lang-btn" th:classappend="${#locale.language == 'en'} ? 'active'">EN</a>
+      <a th:href="@{/auth/register(lang=ru)}" class="lang-btn" th:classappend="${#locale.language == 'ru'} ? 'active'">RU</a>
+      <a th:href="@{/auth/register(lang=kz)}" class="lang-btn" th:classappend="${#locale.language == 'kz'} ? 'active'">KZ</a>
+    </div>
+    <div class="auth-logo">
+      <span class="logo-text"><span class="logo-ace">Ace</span><em class="logo-flow">Flow</em></span>
+    </div>
+    <h1 class="auth-title" th:text="#{auth.create.account}">Create Account</h1>
+
+    <div th:if="${errorKey}" class="alert alert-error" th:text="#{${errorKey}}"></div>
+    <div th:if="${passwordMismatch}" class="alert alert-error">Passwords do not match</div>
+
+    <form th:action="@{/auth/register}" method="post" th:object="${registerForm}" novalidate>
+      <div class="field">
+        <label th:for="name" th:text="#{auth.full.name}">Full Name</label>
+        <input type="text" id="name" th:field="*{name}" class="auth-input"
+               th:classappend="${#fields.hasErrors('name')} ? 'input-error'"
+               placeholder="Yeldar Bazarbay" autocomplete="name" required minlength="2">
+        <span class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+      </div>
+      <div class="field">
+        <label th:for="email" th:text="#{auth.email}">Email</label>
+        <input type="email" id="email" th:field="*{email}" class="auth-input"
+               th:classappend="${#fields.hasErrors('email')} ? 'input-error'"
+               placeholder="name@example.com" autocomplete="email" required>
+        <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+      </div>
+      <div class="field">
+        <label th:for="password" th:text="#{auth.password}">Password</label>
+        <input type="password" id="password" th:field="*{password}" class="auth-input"
+               placeholder="••••••••" autocomplete="new-password" required minlength="8">
+      </div>
+      <div class="field">
+        <label th:for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="auth-input"
+               placeholder="••••••••" autocomplete="new-password" required minlength="8">
+      </div>
+      <button type="submit" class="auth-btn" th:text="#{auth.create.account}">Create Account</button>
+    </form>
+
+    <p class="auth-link">
+      <a th:href="@{/auth/login}" th:text="#{auth.back.to.login}">Back to login</a>
+    </p>
+  </div>
+</div>
+</body>
+</html>
