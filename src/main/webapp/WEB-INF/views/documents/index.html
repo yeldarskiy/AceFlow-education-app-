@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documents - AceFlow</title>
+    <link rel="stylesheet" th:href="@{/static/css/main.css}">
+    <style>
+        .upload-zone { border:2px dashed var(--border); border-radius:12px; padding:40px; text-align:center; cursor:pointer; transition:border-color .15s; margin-bottom:20px; }
+        .upload-zone:hover { border-color:var(--primary); }
+        .doc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
+        .doc-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:box-shadow .15s; }
+        .doc-card:hover { box-shadow:var(--shadow-md); }
+        .doc-thumb { height:80px; display:flex; align-items:center; justify-content:center; font-size:2rem; background:var(--bg); }
+        .doc-body { padding:12px; }
+        .doc-name { font-weight:600; font-size:.85rem; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .doc-meta { font-size:.72rem; color:var(--ink-3); }
+    </style>
+</head>
+<body>
+<div class="app">
+    <nav class="nav">
+        <div class="nav-logo">
+            <span class="logo-text"><span class="logo-ace">Ace</span><em class="logo-flow">Flow</em></span>
+        </div>
+        <div class="nav-section">
+            <div class="nav-label">Overview</div>
+            <a class="nav-item" th:href="@{/dashboard}">&#9776; Dashboard</a>
+            <a class="nav-item" th:href="@{/goals}">&#10003; Goals</a>
+            <a class="nav-item" th:href="@{/studyplan}">&#128197; Study Plan</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-label">Study Tools</div>
+            <a class="nav-item active" th:href="@{/documents}">&#128194; Documents</a>
+            <a class="nav-item" th:href="@{/tests}">&#9998; Tests</a>
+            <a class="nav-item" th:href="@{/flashcards}">&#9830; Flashcards</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-label">Progress</div>
+            <a class="nav-item" th:href="@{/achievements}">&#9733; Achievements</a>
+        </div>
+        <div class="nav-footer">
+            <div class="nav-user">
+                <div class="nav-avatar" th:text="${user != null ? user.initials : 'U'}">U</div>
+                <div>
+                    <div class="nav-uname" th:text="${user != null ? user.name : 'User'}">User</div>
+                    <div class="nav-ulevel">Level <span th:text="${user != null ? user.level : 1}">1</span></div>
+                </div>
+            </div>
+            <form th:action="@{/auth/logout}" method="post" style="margin-top:8px">
+                <button type="submit" style="width:100%;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);padding:6px;border-radius:6px;cursor:pointer;">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-title">Documents</div>
+            <div class="xp-pill">&#9889; <span th:text="${user != null ? user.xpPoints : 0}">0</span> XP</div>
+        </header>
+
+        <div class="content">
+            <div class="sec-head">
+                <h2>Documents</h2>
+                <button class="btn btn-primary" onclick="openModal('modal-upload')">+ Upload</button>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+            <div class="upload-zone" onclick="openModal('modal-upload')">
+                <div style="font-size:2.5rem;margin-bottom:12px;color:var(--primary);">&#8679;</div>
+                <div style="font-weight:600;margin-bottom:6px;">Upload your study materials</div>
+                <div style="color:var(--ink-3);font-size:.85rem;">PDF, DOCX, TXT · Max 50 MB</div>
+            </div>
+
+            <div th:if="${documents != null and !#lists.isEmpty(documents)}" class="doc-grid">
+                <div th:each="doc : ${documents}" class="doc-card">
+                    <div class="doc-thumb">&#128196;</div>
+                    <div class="doc-body">
+                        <div class="doc-name" th:text="${doc.title}">Document</div>
+                        <div class="doc-meta" th:text="${doc.fileType} + ' · ' + ${doc.fileSizeFormatted}">PDF</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-bg" id="modal-upload">
+    <div class="modal">
+        <div class="modal-head">
+            <h3>Upload Document</h3>
+            <button class="modal-x" onclick="closeModal('modal-upload')">&times;</button>
+        </div>
+        <form th:action="@{/documents/upload}" method="post" enctype="multipart/form-data">
+            <div class="field">
+                <label>File (PDF, DOCX, TXT)</label>
+                <input type="file" name="file" accept=".pdf,.docx,.txt" class="auth-input" required>
+            </div>
+            <div class="field">
+                <label>Title</label>
+                <input type="text" name="title" placeholder="Document title" class="auth-input" required maxlength="200">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" onclick="closeModal('modal-upload')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:src="@{/static/js/main.js}"></script>
+</body>
+</html>

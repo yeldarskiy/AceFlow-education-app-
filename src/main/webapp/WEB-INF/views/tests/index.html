@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tests - AceFlow</title>
+    <link rel="stylesheet" th:href="@{/static/css/main.css}">
+    <style>
+        .test-list { display:flex; flex-direction:column; gap:8px; }
+        .test-row { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit; transition:box-shadow .15s; }
+        .test-row:hover { box-shadow:var(--shadow-md); transform:translateY(-1px); }
+        .test-ic { font-size:1.2rem; width:36px; height:36px; border-radius:8px; background:var(--primary-lt); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--primary); }
+        .test-info { flex:1; }
+        .test-name { font-weight:600; font-size:.88rem; margin-bottom:3px; }
+        .test-meta { font-size:.75rem; color:var(--ink-3); display:flex; gap:8px; align-items:center; }
+        .test-score { text-align:right; flex-shrink:0; }
+        .test-score-val { font-size:1.1rem; font-weight:800; }
+        .good { color:var(--green); } .mid { color:var(--gold); } .bad { color:var(--red); } .new { color:var(--ink-3); }
+        .badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:20px; font-size:.72rem; font-weight:600; }
+        .badge-red { background:var(--red-lt); color:var(--red); }
+        .badge-gold { background:var(--gold-lt); color:#854d0e; }
+        .badge-green { background:var(--green-lt); color:var(--green); }
+    </style>
+</head>
+<body>
+<div class="app">
+    <nav class="nav">
+        <div class="nav-logo">
+            <span class="logo-text"><span class="logo-ace">Ace</span><em class="logo-flow">Flow</em></span>
+        </div>
+        <div class="nav-section">
+            <div class="nav-label">Overview</div>
+            <a class="nav-item" th:href="@{/dashboard}">&#9776; Dashboard</a>
+            <a class="nav-item" th:href="@{/goals}">&#10003; Goals</a>
+            <a class="nav-item" th:href="@{/studyplan}">&#128197; Study Plan</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-label">Study Tools</div>
+            <a class="nav-item" th:href="@{/documents}">&#128194; Documents</a>
+            <a class="nav-item active" th:href="@{/tests}">&#9998; Tests</a>
+            <a class="nav-item" th:href="@{/flashcards}">&#9830; Flashcards</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-label">Progress</div>
+            <a class="nav-item" th:href="@{/achievements}">&#9733; Achievements</a>
+        </div>
+        <div class="nav-footer">
+            <div class="nav-user">
+                <div class="nav-avatar" th:text="${user != null ? user.initials : 'U'}">U</div>
+                <div>
+                    <div class="nav-uname" th:text="${user != null ? user.name : 'User'}">User</div>
+                    <div class="nav-ulevel">Level <span th:text="${user != null ? user.level : 1}">1</span></div>
+                </div>
+            </div>
+            <form th:action="@{/auth/logout}" method="post" style="margin-top:8px">
+                <button type="submit" style="width:100%;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);padding:6px;border-radius:6px;cursor:pointer;">Logout</button>
+            </form>
+        </div>
+    </nav>
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-title">Tests</div>
+            <div class="xp-pill">&#9889; <span th:text="${user != null ? user.xpPoints : 0}">0</span> XP</div>
+            <div class="streak-pill">&#128293; <span th:text="${user != null ? user.streakDays : 0}">0</span></div>
+        </header>
+        <div class="content">
+            <div class="sec-head"><h2>Tests</h2></div>
+            <div class="test-list">
+                <a th:each="test : ${tests}"
+                   th:href="@{/tests/{id}/start(id=${test.testId})}"
+                   class="test-row">
+                    <div class="test-ic">&#9998;</div>
+                    <div class="test-info">
+                        <div class="test-name" th:text="${test.title}">Test</div>
+                        <div class="test-meta">
+                            <span th:text="${test.timeLimit} + ' min'">30 min</span>
+                            <span class="badge"
+                                  th:classappend="${test.difficulty == 'HARD'} ? 'badge-red' : (${test.difficulty == 'EASY'} ? 'badge-green' : 'badge-gold')"
+                                  th:text="${test.difficulty}">Medium</span>
+                        </div>
+                    </div>
+                    <div class="test-score">
+                        <div th:if="${test.bestScore != null}"
+                             class="test-score-val"
+                             th:classappend="${test.scoreLabel}"
+                             th:text="${test.bestScore} + '%'">85%</div>
+                        <div th:if="${test.bestScore == null}" class="test-score-val new">New</div>
+                        <div style="font-size:.7rem;color:var(--ink-3);" th:text="${test.bestScore != null ? 'Best' : ''}"></div>
+                    </div>
+                </a>
+                <div th:if="${tests == null or #lists.isEmpty(tests)}" class="card" style="text-align:center;padding:40px;">
+                    <p style="color:var(--ink-3);">No tests available yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/static/js/main.js}"></script>
+</body>
+</html>

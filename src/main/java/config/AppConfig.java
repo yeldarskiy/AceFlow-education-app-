@@ -7,21 +7,15 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
-/**
- * Root Spring application context configuration.
- * Scans all components except controllers (handled by WebConfig).
- */
 @Configuration
 @ComponentScan(basePackages = {
-    "kz.aceflow.service",
-    "kz.aceflow.dao"
+        "kz.aceflow.service",
+        "kz.aceflow.service.impl",
+        "kz.aceflow.dao",
+        "kz.aceflow.dao.impl"
 })
 public class AppConfig {
 
-    /**
-     * Message source for i18n — supports EN, RU, KZ locales.
-     * Files: messages_en.properties, messages_ru.properties, messages_kz.properties
-     */
     @Bean
     public ResourceBundleMessageSource messageSource() {
         ResourceBundleMessageSource source = new ResourceBundleMessageSource();
@@ -31,10 +25,6 @@ public class AppConfig {
         return source;
     }
 
-    /**
-     * Bean Validation factory wired to the Spring message source
-     * so validation messages respect the current locale.
-     */
     @Bean
     public LocalValidatorFactoryBean validator() {
         LocalValidatorFactoryBean factory = new LocalValidatorFactoryBean();
@@ -42,10 +32,6 @@ public class AppConfig {
         return factory;
     }
 
-    /**
-     * Multipart resolver for file uploads (PDF, DOCX, TXT).
-     * Uses Jakarta Servlet 6 StandardServletMultipartResolver.
-     */
     @Bean
     public StandardServletMultipartResolver multipartResolver() {
         return new StandardServletMultipartResolver();

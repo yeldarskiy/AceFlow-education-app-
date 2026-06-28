@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="nav" class="nav">
+    <div class="nav-logo">
+        <span class="logo-text"><span class="logo-ace">Ace</span><em class="logo-flow">Flow</em></span>
+    </div>
+    <div class="nav-section">
+        <div class="nav-label">Overview</div>
+        <a class="nav-item" th:href="@{/dashboard}">Dashboard</a>
+        <a class="nav-item" th:href="@{/goals}">Goals</a>
+        <a class="nav-item" th:href="@{/studyplan}">Study Plan</a>
+    </div>
+    <div class="nav-section">
+        <div class="nav-label">Study Tools</div>
+        <a class="nav-item" th:href="@{/documents}">Documents</a>
+        <a class="nav-item" th:href="@{/tests}">Tests</a>
+        <a class="nav-item" th:href="@{/flashcards}">Flashcards</a>
+    </div>
+    <div class="nav-section">
+        <div class="nav-label">Progress</div>
+        <a class="nav-item" th:href="@{/achievements}">Achievements</a>
+    </div>
+    <div class="nav-footer">
+        <div class="nav-user">
+            <div class="nav-avatar">U</div>
+            <div><div class="nav-uname">User</div></div>
+        </div>
+        <form th:action="@{/auth/logout}" method="post" style="margin-top:8px">
+            <button type="submit" style="width:100%;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);padding:6px;border-radius:6px;cursor:pointer;">Logout</button>
+        </form>
+    </div>
+</nav>
+</body>
+</html>

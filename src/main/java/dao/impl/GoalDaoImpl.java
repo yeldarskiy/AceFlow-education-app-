@@ -13,9 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * JDBC implementation of {@link GoalDao} using PreparedStatements.
- */
 @Repository
 public class GoalDaoImpl implements GoalDao {
 
@@ -23,38 +20,39 @@ public class GoalDaoImpl implements GoalDao {
     private final ConnectionPool pool = ConnectionPool.getInstance();
 
     private static final String SQL_SAVE =
-        "INSERT INTO goals (user_id, title, deadline, is_completed, xp_reward, priority) " +
-        "VALUES (?, ?, ?, ?, ?, ?) RETURNING goal_id";
+            "INSERT INTO goals (user_id, title, deadline, is_completed, xp_reward, priority) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_FIND_BY_ID =
-        "SELECT goal_id, user_id, title, deadline, is_completed, xp_reward, priority " +
-        "FROM goals WHERE goal_id = ?";
+            "SELECT goal_id, user_id, title, deadline, is_completed, xp_reward, priority " +
+                    "FROM goals WHERE goal_id = ?";
 
     private static final String SQL_FIND_BY_USER =
-        "SELECT goal_id, user_id, title, deadline, is_completed, xp_reward, priority " +
-        "FROM goals WHERE user_id = ? ORDER BY is_completed ASC, deadline ASC NULLS LAST";
+            "SELECT goal_id, user_id, title, deadline, is_completed, xp_reward, priority " +
+                    "FROM goals WHERE user_id = ? ORDER BY is_completed ASC, deadline IS NULL ASC, deadline ASC";
 
     private static final String SQL_UPDATE =
-        "UPDATE goals SET title = ?, deadline = ?, priority = ? WHERE goal_id = ?";
+            "UPDATE goals SET title = ?, deadline = ?, priority = ? WHERE goal_id = ?";
 
     private static final String SQL_MARK_COMPLETED =
-        "UPDATE goals SET is_completed = TRUE WHERE goal_id = ?";
+            "UPDATE goals SET is_completed = TRUE WHERE goal_id = ?";
 
     private static final String SQL_DELETE =
-        "DELETE FROM goals WHERE goal_id = ?";
+            "DELETE FROM goals WHERE goal_id = ?";
 
     @Override
     public Goal save(Goal goal) {
         Connection conn = pool.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(SQL_SAVE)) {
+        try (PreparedStatement ps = conn.prepareStatement(SQL_SAVE, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, goal.getUserId());
             ps.setString(2, goal.getTitle());
             ps.setObject(3, goal.getDeadline());
             ps.setBoolean(4, goal.isCompleted());
             ps.setInt(5, goal.getXpReward());
             ps.setString(6, goal.getPriority() != null ? goal.getPriority() : "MEDIUM");
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) goal.setGoalId(rs.getInt("goal_id"));
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) goal.setGoalId(keys.getInt(1));
             }
             return goal;
         } catch (SQLException e) {

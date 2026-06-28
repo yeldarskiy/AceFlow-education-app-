@@ -13,76 +13,75 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * JDBC implementation of {@link UserDao}.
- * All SQL uses PreparedStatements — no string concatenation is used in queries.
- */
 @Repository
 public class UserDaoImpl implements UserDao {
 
     private static final Logger log = LoggerFactory.getLogger(UserDaoImpl.class);
 
     private static final String SQL_SAVE =
-        "INSERT INTO users (name, email, password_hash, xp_points, streak_days, role) " +
-        "VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id, created_at";
+            "INSERT INTO users (name, email, password_hash, xp_points, streak_days, role) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_FIND_BY_ID =
-        "SELECT user_id, name, email, password_hash, xp_points, streak_days, role, created_at " +
-        "FROM users WHERE user_id = ?";
+            "SELECT user_id, name, email, password_hash, xp_points, streak_days, role, created_at " +
+                    "FROM users WHERE user_id = ?";
 
     private static final String SQL_FIND_BY_EMAIL =
-        "SELECT user_id, name, email, password_hash, xp_points, streak_days, role, created_at " +
-        "FROM users WHERE LOWER(email) = LOWER(?)";
+            "SELECT user_id, name, email, password_hash, xp_points, streak_days, role, created_at " +
+                    "FROM users WHERE LOWER(email) = LOWER(?)";
 
     private static final String SQL_FIND_ALL =
-        "SELECT user_id, name, email, password_hash, xp_points, streak_days, role, created_at " +
-        "FROM users ORDER BY created_at DESC";
+            "SELECT user_id, name, email, password_hash, xp_points, streak_days, role, created_at " +
+                    "FROM users ORDER BY created_at DESC";
 
     private static final String SQL_UPDATE =
-        "UPDATE users SET name = ?, xp_points = ?, streak_days = ? WHERE user_id = ?";
+            "UPDATE users SET name = ?, xp_points = ?, streak_days = ? WHERE user_id = ?";
 
     private static final String SQL_UPDATE_PASSWORD =
-        "UPDATE users SET password_hash = ? WHERE user_id = ?";
+            "UPDATE users SET password_hash = ? WHERE user_id = ?";
 
     private static final String SQL_ADD_XP =
-        "UPDATE users SET xp_points = xp_points + ? WHERE user_id = ? RETURNING xp_points";
+            "UPDATE users SET xp_points = xp_points + ? WHERE user_id = ?";
+
+    private static final String SQL_GET_XP =
+            "SELECT xp_points FROM users WHERE user_id = ?";
 
     private static final String SQL_INCREMENT_STREAK =
-        "UPDATE users SET streak_days = streak_days + 1 WHERE user_id = ?";
+            "UPDATE users SET streak_days = streak_days + 1 WHERE user_id = ?";
 
     private static final String SQL_RESET_STREAK =
-        "UPDATE users SET streak_days = 0 WHERE user_id = ?";
+            "UPDATE users SET streak_days = 0 WHERE user_id = ?";
 
     private static final String SQL_DELETE =
-        "DELETE FROM users WHERE user_id = ?";
+            "DELETE FROM users WHERE user_id = ?";
 
     private static final String SQL_EXISTS_EMAIL =
-        "SELECT 1 FROM users WHERE LOWER(email) = LOWER(?)";
+            "SELECT 1 FROM users WHERE LOWER(email) = LOWER(?)";
 
     private final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     @Override
     public User save(User user) {
         Connection conn = connectionPool.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(SQL_SAVE)) {
+        try (PreparedStatement ps = conn.prepareStatement(SQL_SAVE, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPasswordHash());
             ps.setInt(4, user.getXpPoints());
             ps.setInt(5, user.getStreakDays());
             ps.setString(6, user.getRole() != null ? user.getRole() : "STUDENT");
+            ps.executeUpdate();
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    user.setUserId(rs.getInt("user_id"));
-                    user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    user.setUserId(keys.getInt(1));
                 }
             }
             log.info("Saved new user: {}", user.getEmail());
             return user;
         } catch (SQLException e) {
             log.error("Failed to save user: {}", user.getEmail(), e);
-            throw new DaoException("Failed to save user", e);
+            throw new DaoException("Failed to save user: " + e.getMessage(), e);
         } finally {
             connectionPool.releaseConnection(conn);
         }
@@ -94,9 +93,7 @@ public class UserDaoImpl implements UserDao {
         try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_BY_ID)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapRow(rs));
-                }
+                if (rs.next()) return Optional.of(mapRow(rs));
             }
         } catch (SQLException e) {
             log.error("Failed to find user by id: {}", userId, e);
@@ -113,9 +110,7 @@ public class UserDaoImpl implements UserDao {
         try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_BY_EMAIL)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapRow(rs));
-                }
+                if (rs.next()) return Optional.of(mapRow(rs));
             }
         } catch (SQLException e) {
             log.error("Failed to find user by email: {}", email, e);
@@ -132,9 +127,7 @@ public class UserDaoImpl implements UserDao {
         Connection conn = connectionPool.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_ALL);
              ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                users.add(mapRow(rs));
-            }
+            while (rs.next()) users.add(mapRow(rs));
         } catch (SQLException e) {
             log.error("Failed to fetch all users", e);
             throw new DaoException("Failed to fetch all users", e);
@@ -179,12 +172,16 @@ public class UserDaoImpl implements UserDao {
     @Override
     public int addXp(int userId, int xpAmount) {
         Connection conn = connectionPool.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(SQL_ADD_XP)) {
-            ps.setInt(1, xpAmount);
-            ps.setInt(2, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("xp_points");
+        try {
+            try (PreparedStatement ps = conn.prepareStatement(SQL_ADD_XP)) {
+                ps.setInt(1, xpAmount);
+                ps.setInt(2, userId);
+                ps.executeUpdate();
+            }
+            try (PreparedStatement ps2 = conn.prepareStatement(SQL_GET_XP)) {
+                ps2.setInt(1, userId);
+                try (ResultSet rs = ps2.executeQuery()) {
+                    if (rs.next()) return rs.getInt("xp_points");
                 }
             }
         } catch (SQLException e) {
@@ -254,7 +251,6 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
-    /** Maps a single ResultSet row to a {@link User} object. */
     private User mapRow(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("user_id"));

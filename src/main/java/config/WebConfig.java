@@ -2,7 +2,6 @@ package kz.aceflow.config;
 
 import kz.aceflow.interceptor.AuthInterceptor;
 import kz.aceflow.interceptor.LocaleInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -15,22 +14,24 @@ import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 
 import java.util.Locale;
 
-/**
- * Spring MVC web layer configuration.
- * Configures Thymeleaf, i18n locale resolution, interceptors, and static resources.
- */
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "kz.aceflow.controller")
+@ComponentScan(basePackages = {
+        "kz.aceflow.controller",
+        "kz.aceflow.interceptor"
+})
 public class WebConfig implements WebMvcConfigurer {
 
-    @Autowired
-    private AuthInterceptor authInterceptor;
+    @Bean
+    public AuthInterceptor authInterceptor() {
+        return new AuthInterceptor();
+    }
 
-    @Autowired
-    private LocaleInterceptor localeInterceptor;
+    @Bean
+    public LocaleInterceptor localeInterceptor() {
+        return new LocaleInterceptor(localeResolver());
+    }
 
-    // ── Thymeleaf ────────────────────────────────────────────────────────
 
     @Bean
     public SpringResourceTemplateResolver templateResolver() {
@@ -39,7 +40,7 @@ public class WebConfig implements WebMvcConfigurer {
         resolver.setSuffix(".html");
         resolver.setTemplateMode("HTML");
         resolver.setCharacterEncoding("UTF-8");
-        resolver.setCacheable(false); // set true in production
+        resolver.setCacheable(false);
         return resolver;
     }
 
@@ -60,12 +61,7 @@ public class WebConfig implements WebMvcConfigurer {
         return resolver;
     }
 
-    // ── Locale / i18n ─────────────────────────────────────────────────
 
-    /**
-     * Stores the user's language preference in the HTTP session.
-     * Defaults to English.
-     */
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver resolver = new SessionLocaleResolver();
@@ -73,7 +69,6 @@ public class WebConfig implements WebMvcConfigurer {
         return resolver;
     }
 
-    // ── Static Resources ──────────────────────────────────────────────
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -81,24 +76,18 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("/WEB-INF/static/");
     }
 
-    // ── Interceptors ──────────────────────────────────────────────────
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // Locale interceptor applies to every request
-        registry.addInterceptor(localeInterceptor);
+        registry.addInterceptor(localeInterceptor());
 
-        // Auth interceptor protects all paths except auth and static resources
-        registry.addInterceptor(authInterceptor)
+        registry.addInterceptor(authInterceptor())
                 .addPathPatterns("/**")
                 .excludePathPatterns(
-                    "/auth/**",
-                    "/static/**",
-                    "/error/**"
+                        "/auth/**",
+                        "/static/**",
+                        "/error/**"
                 );
     }
-
-    // ── Default Servlet ───────────────────────────────────────────────
 
     @Override
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {

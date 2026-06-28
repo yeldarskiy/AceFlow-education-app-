@@ -54,7 +54,7 @@ public class GoalController {
     }
 
     @PostMapping("/{goalId}/complete")
-    public String completeGoal(@PathVariable int goalId,
+    public String completeGoal(@PathVariable("goalId") int goalId,
                                HttpSession session,
                                RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("currentUser");
@@ -64,7 +64,7 @@ public class GoalController {
     }
 
     @PostMapping("/{goalId}/delete")
-    public String deleteGoal(@PathVariable int goalId,
+    public String deleteGoal(@PathVariable("goalId") int goalId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("currentUser");
