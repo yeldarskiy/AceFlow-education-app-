@@ -1,4 +1,4 @@
-# AceFlow 🎓
+# AceFlow 
 
 AI-powered exam preparation web application built with Spring MVC + JDBC.
 
@@ -67,15 +67,15 @@ mvn test
 
 ## Features
 
-- 🔐 User authentication (register/login/logout) with BCrypt
-- 📄 Document upload (PDF, DOCX, TXT)
-- ✅ Practice tests with scoring and XP rewards
-- 🃏 Spaced-repetition flashcards
-- 🎯 Goal tracking with deadlines
-- 📅 Study plans for exams
-- 🏆 Achievements and leaderboard
-- 🌐 3-language interface (EN/RU/KZ)
-- 📱 Responsive design (Bootstrap-compatible CSS)
+- User authentication (register/login/logout) with BCrypt
+- Document upload (PDF, DOCX, TXT)
+- Practice tests with scoring and XP rewards
+- Spaced-repetition flashcards
+- Goal tracking with deadlines
+- Study plans for exams
+- Achievements and leaderboard
+- 3-language interface (EN/RU/KZ)
+- Responsive design (Bootstrap-compatible CSS)
 
 ## Test Credentials
 
