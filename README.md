@@ -5,7 +5,7 @@ AI-powered exam preparation web application built with Spring MVC + JDBC.
 ## Tech Stack
 
 - **Backend:** Java 17, Spring Core, Spring MVC, Servlets
-- **Database:** PostgreSQL + pure JDBC (custom Connection Pool, no ORM)
+- **Database:** MySQL + pure JDBC (custom Connection Pool, no ORM)
 - **Templates:** Thymeleaf (server-side rendering)
 - **Security:** BCrypt password hashing, PreparedStatements (SQL injection protection)
 - **i18n:** EN | RU | KZ (3 locales)
