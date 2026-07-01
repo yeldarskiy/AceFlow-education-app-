@@ -36,4 +36,18 @@ public class AppConfig {
     public StandardServletMultipartResolver multipartResolver() {
         return new StandardServletMultipartResolver();
     }
+
+    /**
+     * Ties the custom {@link kz.aceflow.util.ConnectionPool} singleton's
+     * lifecycle to this Spring application context. Spring calls
+     * {@code init()} on startup and {@code destroy()} when the context
+     * shuts down (app undeploy/redeploy or Tomcat stop), which closes
+     * every pooled JDBC connection so the database link is properly severed.
+     *
+     * @see ConnectionPoolLifecycle
+     */
+    @Bean(initMethod = "init", destroyMethod = "destroy")
+    public ConnectionPoolLifecycle connectionPoolLifecycle() {
+        return new ConnectionPoolLifecycle();
+    }
 }

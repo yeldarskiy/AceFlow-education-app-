@@ -1,10 +1,12 @@
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/config/AppConfig.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/config/ConnectionPoolLifecycle.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/config/WebAppInitializer.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/config/WebConfig.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/AchievementController.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/AuthController.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/DashboardController.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/DocumentController.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/ErrorPageController.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/FlashcardController.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/GlobalExceptionHandler.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/GoalController.java
@@ -41,8 +43,14 @@
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/model/Test.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/model/TestResult.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/model/User.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/service/DocumentService.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/service/FlashcardService.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/service/GoalService.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/service/TestService.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/service/UserService.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/service/impl/DocumentServiceImpl.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/service/impl/FlashcardServiceImpl.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/service/impl/GoalServiceImpl.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/service/impl/TestServiceImpl.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/service/impl/UserServiceImpl.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/util/ConnectionPool.java

@@ -1,70 +1,53 @@
 package kz.aceflow.controller;
 
 import jakarta.servlet.http.HttpSession;
-import kz.aceflow.dao.FlashcardDao;
-import kz.aceflow.model.Flashcard;
 import kz.aceflow.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import kz.aceflow.service.FlashcardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
-import java.util.List;
-
+/**
+ * Handles flashcard listing, study sessions, and rating.
+ * All persistence and spaced-repetition logic lives in {@link FlashcardService} —
+ * this controller never touches a DAO directly.
+ */
 @Controller
 @RequestMapping("/flashcards")
 public class FlashcardController {
 
-    private static final Logger log = LoggerFactory.getLogger(FlashcardController.class);
-    private final FlashcardDao flashcardDao;
+    private final FlashcardService flashcardService;
 
     @Autowired
-    public FlashcardController(FlashcardDao flashcardDao) {
-        this.flashcardDao = flashcardDao;
+    public FlashcardController(FlashcardService flashcardService) {
+        this.flashcardService = flashcardService;
     }
 
     @GetMapping
     public String listFlashcards(HttpSession session, Model model) {
         User user = (User) session.getAttribute("currentUser");
-        List<Flashcard> cards = flashcardDao.findByUserId(user.getUserId(), 0, 50);
-        int total = flashcardDao.countByUserId(user.getUserId());
-        int mastered = flashcardDao.countMasteredByUserId(user.getUserId());
         model.addAttribute("user", user);
-        model.addAttribute("cards", cards);
-        model.addAttribute("total", total);
-        model.addAttribute("mastered", mastered);
+        model.addAttribute("cards", flashcardService.getCardsByUserId(user.getUserId(), 0, 50));
+        model.addAttribute("total", flashcardService.countCardsByUserId(user.getUserId()));
+        model.addAttribute("mastered", flashcardService.countMasteredByUserId(user.getUserId()));
         return "flashcards/index";
     }
 
     @GetMapping("/study")
     public String studyFlashcards(HttpSession session, Model model) {
         User user = (User) session.getAttribute("currentUser");
-        List<Flashcard> cards = flashcardDao.findDueForReview(user.getUserId());
         model.addAttribute("user", user);
-        model.addAttribute("cards", cards);
+        model.addAttribute("cards", flashcardService.getCardsDueForReview(user.getUserId()));
         return "flashcards/study";
     }
 
     @PostMapping("/{cardId}/rate")
     public String rateCard(@PathVariable int cardId,
                            @RequestParam String rating,
-                           HttpSession session,
-                           RedirectAttributes redirectAttributes) {
-        User user = (User) session.getAttribute("currentUser");
-        flashcardDao.findById(cardId).ifPresent(card -> {
-            card.setTimesReviewed(card.getTimesReviewed() + 1);
-            switch (rating) {
-                case "easy" -> { card.setNextReview(LocalDate.now().plusDays(7)); card.setDifficulty("EASY"); }
-                case "ok"   -> { card.setNextReview(LocalDate.now().plusDays(3)); card.setDifficulty("MEDIUM"); }
-                case "hard" -> { card.setNextReview(LocalDate.now().plusDays(1)); card.setDifficulty("HARD"); }
-                case "master" -> { card.setMastered(true); card.setNextReview(LocalDate.now().plusDays(30)); }
-            }
-            flashcardDao.update(card);
-        });
+                           HttpSession session) {
+        flashcardService.rateCard(cardId, rating);
         return "redirect:/flashcards/study";
     }
 
@@ -74,12 +57,7 @@ public class FlashcardController {
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("currentUser");
-        Flashcard card = new Flashcard();
-        card.setUserId(user.getUserId());
-        card.setFrontText(frontText);
-        card.setBackText(backText);
-        card.setDifficulty("MEDIUM");
-        flashcardDao.save(card);
+        flashcardService.createCard(user.getUserId(), frontText, backText);
         redirectAttributes.addFlashAttribute("successMessage", "Flashcard created!");
         return "redirect:/flashcards";
     }

@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * Global exception handler — maps exceptions to user-friendly error pages.
  * Never exposes stack traces or internal details to the user.
+ * <p>
+ * Every handler here sets {@code errorKey} to a valid i18n message code before
+ * returning the view; {@code error/error.html} resolves it with
+ * {@code th:text="#{${errorKey}}"}. Keep that contract — Thymeleaf message
+ * expressions ({@code #{...}}) do not support the Elvis operator
+ * ({@code ?:}) inside them, so a fallback must never be attempted in the view.
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,6 +39,21 @@ public class GlobalExceptionHandler {
         log.warn("Forbidden access: {}", ex.getMessage());
         model.addAttribute("errorKey", "common.error.forbidden");
         model.addAttribute("status", 403);
+        return "error/error";
+    }
+
+    /**
+     * Catches validation failures thrown by the service layer (e.g.
+     * {@code DocumentService.uploadDocument}) that escape a controller
+     * without being handled inline. The exception message is expected to
+     * already be an i18n key (see {@code DocumentServiceImpl}).
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public String handleValidation(IllegalArgumentException ex, Model model) {
+        log.warn("Validation failed: {}", ex.getMessage());
+        model.addAttribute("errorKey", "common.error.generic");
+        model.addAttribute("status", 400);
         return "error/error";
     }
 

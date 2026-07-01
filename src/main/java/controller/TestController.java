@@ -1,11 +1,8 @@
 package kz.aceflow.controller;
 
 import jakarta.servlet.http.HttpSession;
-import kz.aceflow.dao.TestDao;
-import kz.aceflow.dao.TestResultDao;
-import kz.aceflow.model.Test;
-import kz.aceflow.model.TestResult;
 import kz.aceflow.model.User;
+import kz.aceflow.service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,20 +10,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-import java.util.Optional;
-
+/**
+ * Lists available tests. All data access goes through {@link TestService} —
+ * this controller never touches a DAO directly.
+ */
 @Controller
 @RequestMapping("/tests")
 public class TestController {
 
-    private final TestDao testDao;
-    private final TestResultDao testResultDao;
+    private final TestService testService;
 
     @Autowired
-    public TestController(TestDao testDao, TestResultDao testResultDao) {
-        this.testDao = testDao;
-        this.testResultDao = testResultDao;
+    public TestController(TestService testService) {
+        this.testService = testService;
     }
 
     @GetMapping
@@ -34,18 +30,12 @@ public class TestController {
                             HttpSession session, Model model) {
         User user = (User) session.getAttribute("currentUser");
         int pageSize = 10;
-        List<Test> tests = testDao.findAll(page, pageSize);
-        int total = testDao.countAll();
+
+        int total = testService.countAllTests();
         int totalPages = (int) Math.ceil((double) total / pageSize);
 
-        for (Test test : tests) {
-            Optional<TestResult> best = testResultDao.findBestScoreByUserAndTest(
-                    user.getUserId(), test.getTestId());
-            best.ifPresent(r -> test.setBestScore(r.getScore()));
-        }
-
         model.addAttribute("user", user);
-        model.addAttribute("tests", tests);
+        model.addAttribute("tests", testService.getTestsPage(user.getUserId(), page, pageSize));
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         return "tests/index";

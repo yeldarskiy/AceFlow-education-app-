@@ -2,18 +2,395 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Error - AceFlow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title th:text="${status} + ' - AceFlow'">Error - AceFlow</title>
 <link rel="stylesheet" th:href="@{/static/css/main.css}">
+<style>
+.err-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Floating ambient orbs ── */
+.err-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(2px);
+  pointer-events: none;
+  opacity: .55;
+}
+.err-orb-1 {
+  width: 520px; height: 520px;
+  background: radial-gradient(circle, rgba(37,99,235,.22) 0%, transparent 68%);
+  top: -180px; right: -140px;
+  animation: orbFloat1 11s ease-in-out infinite;
+}
+.err-orb-2 {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(6,182,212,.18) 0%, transparent 68%);
+  bottom: -150px; left: -110px;
+  animation: orbFloat2 13s ease-in-out infinite;
+}
+.err-orb-3 {
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(124,58,237,.14) 0%, transparent 70%);
+  top: 50%; left: 8%;
+  animation: orbFloat3 9s ease-in-out infinite;
+}
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50%      { transform: translate(-30px, 26px) scale(1.06); }
+}
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50%      { transform: translate(24px, -22px) scale(1.08); }
+}
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(0,0); opacity: .35; }
+  50%      { transform: translate(18px, -30px); opacity: .6; }
+}
+
+/* ── Drifting particles ── */
+.err-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.err-particle:nth-child(1) { width: 6px; height: 6px; background: var(--primary); top: 18%; left: 14%; opacity: .5; animation: drift 7s ease-in-out infinite; }
+.err-particle:nth-child(2) { width: 4px; height: 4px; background: var(--cyan); top: 70%; left: 20%; opacity: .45; animation: drift 9s ease-in-out infinite 1s; }
+.err-particle:nth-child(3) { width: 5px; height: 5px; background: var(--primary); top: 24%; right: 16%; opacity: .4; animation: drift 8s ease-in-out infinite .5s; }
+.err-particle:nth-child(4) { width: 3px; height: 3px; background: var(--cyan); top: 78%; right: 22%; opacity: .5; animation: drift 6.5s ease-in-out infinite 1.5s; }
+.err-particle:nth-child(5) { width: 4px; height: 4px; background: #7c3aed; top: 45%; left: 6%; opacity: .35; animation: drift 10s ease-in-out infinite 2s; }
+.err-particle:nth-child(6) { width: 3px; height: 3px; background: var(--primary); top: 12%; right: 30%; opacity: .4; animation: drift 7.5s ease-in-out infinite .8s; }
+@keyframes drift {
+  0%, 100% { transform: translate(0,0); opacity: .3; }
+  50%      { transform: translate(14px, -22px); opacity: .65; }
+}
+
+/* ── Card ── */
+.err-card {
+  position: relative;
+  z-index: 1;
+  background: var(--card);
+  border-radius: 22px;
+  padding: 50px 42px;
+  width: 460px;
+  max-width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: cardEntrance .6s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes cardEntrance {
+  0%   { opacity: 0; transform: translateY(28px) scale(.94); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.err-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  animation: fadeSlideDown .5s ease .15s both;
+}
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.err-logo svg { width: 32px; height: 32px; flex-shrink: 0; }
+
+/* ── Icon stage ── */
+.err-icon-stage {
+  width: 104px;
+  height: 104px;
+  margin: 0 auto 22px;
+  position: relative;
+}
+.err-icon-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  animation: ringPulse 2.6s ease-out infinite;
+}
+.err-icon-ring.ring-2 { animation-delay: .9s; }
+.tone-404 .err-icon-ring { background: radial-gradient(circle, transparent 60%, rgba(37,99,235,.16) 61%, transparent 64%); }
+.tone-403 .err-icon-ring,
+.tone-400 .err-icon-ring { background: radial-gradient(circle, transparent 60%, rgba(234,179,8,.18) 61%, transparent 64%); }
+.tone-500 .err-icon-ring { background: radial-gradient(circle, transparent 60%, rgba(220,38,38,.18) 61%, transparent 64%); }
+@keyframes ringPulse {
+  0%   { transform: scale(.7); opacity: 0; }
+  35%  { opacity: 1; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+.err-icon-wrap {
+  position: absolute;
+  inset: 8px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: iconPop .55s cubic-bezier(.34,1.56,.64,1) .25s both,
+             iconFloat 3.4s ease-in-out 1s infinite;
+}
+@keyframes iconPop {
+  0%   { transform: scale(0) rotate(-12deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+.tone-404 .err-icon-wrap { background: linear-gradient(135deg, var(--primary-lt), #dbe7ff); }
+.tone-403 .err-icon-wrap,
+.tone-400 .err-icon-wrap { background: linear-gradient(135deg, var(--gold-lt), #fef0c7); }
+.tone-500 .err-icon-wrap { background: linear-gradient(135deg, var(--red-lt), #fee0e0); }
+.err-icon-wrap svg { width: 42px; height: 42px; }
+.tone-404 .err-icon-wrap svg { color: var(--primary); }
+.tone-403 .err-icon-wrap svg,
+.tone-400 .err-icon-wrap svg { color: #b45309; }
+.tone-500 .err-icon-wrap svg { color: var(--red); }
+
+/* subtle search-icon glint for 404 */
+.tone-404 .err-icon-wrap svg circle { animation: glintScan 3s ease-in-out 1.2s infinite; }
+@keyframes glintScan {
+  0%, 100% { stroke-dasharray: 0 100; }
+  50%      { stroke-dasharray: 44 100; }
+}
+
+/* shake for 500 to feel "off" */
+.tone-500 .err-icon-wrap { animation: iconPop .55s cubic-bezier(.34,1.56,.64,1) .25s both,
+                                       jiggle 2.8s ease-in-out 1.1s infinite; }
+@keyframes jiggle {
+  0%, 92%, 100% { transform: rotate(0); }
+  94%           { transform: rotate(-4deg); }
+  96%           { transform: rotate(4deg); }
+  98%           { transform: rotate(-2deg); }
+}
+
+/* lock shackle nudge for 403 */
+.tone-403 .err-icon-wrap { animation: iconPop .55s cubic-bezier(.34,1.56,.64,1) .25s both,
+                                       lockNudge 3.2s ease-in-out 1s infinite; }
+@keyframes lockNudge {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50%      { transform: translateY(-3px) rotate(-2deg); }
+}
+
+.err-code {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 10px;
+  animation: fadeUp .5s ease .35s both;
+}
+.err-code span {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-family: var(--mono, monospace);
+}
+
+.err-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: var(--ink);
+  animation: fadeUp .5s ease .42s both;
+}
+
+.err-message {
+  font-size: .92rem;
+  color: var(--ink-2);
+  line-height: 1.6;
+  margin-bottom: 32px;
+  animation: fadeUp .5s ease .5s both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.err-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeUp .5s ease .58s both;
+}
+.err-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease, background .18s ease;
+  text-decoration: none;
+}
+.err-btn-primary {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 4px 14px rgba(15,23,42,.1);
+}
+.err-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,23,42,.16); border-color: var(--primary); }
+.err-btn-primary:active { transform: translateY(0) scale(.97); }
+.err-btn-primary svg { transition: transform .18s ease; }
+.err-btn-primary:hover svg { transform: translateX(-3px); }
+
+.err-btn-ghost {
+  background: var(--bg);
+  color: var(--ink-2);
+  border: 1px solid var(--border);
+}
+.err-btn-ghost:hover { background: var(--border); transform: translateY(-2px); }
+.err-btn-ghost:active { transform: translateY(0) scale(.97); }
+
+.err-footer {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: .76rem;
+  color: var(--ink-3);
+  animation: fadeUp .5s ease .66s both;
+}
+.err-footer .logo-flow { color: var(--cyan); font-style: normal; font-weight: 700; }
+.err-footer .logo-ace { color: var(--primary); font-weight: 700; }
+
+@media (max-width: 480px) {
+  .err-card { padding: 38px 26px; }
+  .err-actions { flex-direction: column; }
+  .err-btn { justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .err-orb, .err-particle, .err-icon-ring, .err-icon-wrap,
+  .err-btn-primary, .err-card, .err-logo, .err-code,
+  .err-title, .err-message, .err-actions, .err-footer {
+    animation: none !important;
+  }
+}
+</style>
 </head>
 <body class="auth-body">
-<div class="auth-page">
-  <div class="auth-box" style="text-align:center;">
-    <div class="auth-logo">
+<div class="err-page">
+
+  <div class="err-orb err-orb-1"></div>
+  <div class="err-orb err-orb-2"></div>
+  <div class="err-orb err-orb-3"></div>
+  <span class="err-particle"></span>
+  <span class="err-particle"></span>
+  <span class="err-particle"></span>
+  <span class="err-particle"></span>
+  <span class="err-particle"></span>
+  <span class="err-particle"></span>
+
+  <div class="err-card">
+
+    <div class="err-logo">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="40" height="40" rx="10" fill="#0f172a"/>
+        <path d="M14 32L24 14L34 32" stroke="url(#errGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="18" y1="26" x2="30" y2="26" stroke="url(#errGrad)" stroke-width="3" stroke-linecap="round"/>
+        <defs>
+          <linearGradient id="errGrad" x1="14" y1="14" x2="34" y2="32">
+            <stop stop-color="#7c3aed"/>
+            <stop offset="1" stop-color="#06b6d4"/>
+          </linearGradient>
+        </defs>
+      </svg>
       <span class="logo-text"><span class="logo-ace">Ace</span><em class="logo-flow">Flow</em></span>
     </div>
-    <h2 th:text="${status}">Error</h2>
-    <p th:text="#{${errorKey} ?: 'common.error.generic'}">Something went wrong.</p>
-    <a th:href="@{/dashboard}" class="btn btn-primary" style="margin-top:16px;display:inline-flex">Go to Dashboard</a>
+
+    <!-- 404: not found -->
+    <div th:if="${status == 404}" class="err-icon-stage tone-404">
+      <span class="err-icon-ring"></span>
+      <span class="err-icon-ring ring-2"></span>
+      <div class="err-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 403: forbidden -->
+    <div th:if="${status == 403}" class="err-icon-stage tone-403">
+      <span class="err-icon-ring"></span>
+      <span class="err-icon-ring ring-2"></span>
+      <div class="err-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 400: bad request / validation -->
+    <div th:if="${status == 400}" class="err-icon-stage tone-400">
+      <span class="err-icon-ring"></span>
+      <span class="err-icon-ring ring-2"></span>
+      <div class="err-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 500 / default: server error -->
+    <div th:if="${status == null or (status != 404 and status != 403 and status != 400)}" class="err-icon-stage tone-500">
+      <span class="err-icon-ring"></span>
+      <span class="err-icon-ring ring-2"></span>
+      <div class="err-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 9v4"/>
+          <path d="M12 17h.01"/>
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="err-code"><span th:text="'Error ' + ${status}">Error 500</span></div>
+
+    <h1 class="err-title" th:switch="${status}">
+      <span th:case="404">Page Not Found</span>
+      <span th:case="403">Access Denied</span>
+      <span th:case="400">Something's Not Right</span>
+      <span th:case="*">Something Went Wrong</span>
+    </h1>
+
+    <p class="err-message" th:text="#{${errorKey}}">Something went wrong. Please try again.</p>
+
+    <div class="err-actions">
+      <a th:href="@{/dashboard}" class="err-btn err-btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6" transform="rotate(180 12 12)"/>
+        </svg>
+        Go to Dashboard
+      </a>
+      <a href="javascript:history.back()" class="err-btn err-btn-ghost">Go Back</a>
+    </div>
+
+    <div class="err-footer">
+      <span class="logo-ace">Ace</span><em class="logo-flow">Flow</em> · Flow into success
+    </div>
+
   </div>
 </div>
 </body>
