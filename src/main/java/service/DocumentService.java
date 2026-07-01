@@ -31,4 +31,9 @@ public interface DocumentService {
      * @return list of documents for the requested page
      */
     List<Document> getDocumentsByUserId(int userId, int page, int pageSize);
+
+    /**
+     * Total number of documents owned by a user.
+     */
+    int countByUserId(int userId);
 }

@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="lang-switch(path)" class="lang-switch">
+    <a th:href="@{${path}(lang=en)}" class="lang-btn" th:classappend="${#locale.language == 'en'} ? 'active'">EN</a>
+    <a th:href="@{${path}(lang=ru)}" class="lang-btn" th:classappend="${#locale.language == 'ru'} ? 'active'">RU</a>
+    <a th:href="@{${path}(lang=kz)}" class="lang-btn" th:classappend="${#locale.language == 'kz'} ? 'active'">KZ</a>
+</div>
+</body>
+</html>

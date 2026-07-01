@@ -35,8 +35,15 @@ public class DocumentController {
     public String listDocuments(@RequestParam(defaultValue = "0") int page,
                                 HttpSession session, Model model) {
         User user = (User) session.getAttribute("currentUser");
+        int pageSize = 12;
+        int total = documentService.countByUserId(user.getUserId());
+        int totalPages = Math.max(1, (int) Math.ceil((double) total / pageSize));
+
         model.addAttribute("user", user);
-        model.addAttribute("documents", documentService.getDocumentsByUserId(user.getUserId(), page, 12));
+        model.addAttribute("documents", documentService.getDocumentsByUserId(user.getUserId(), page, pageSize));
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalItems", total);
         return "documents/index";
     }
 

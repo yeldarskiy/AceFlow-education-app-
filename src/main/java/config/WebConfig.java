@@ -2,6 +2,7 @@ package kz.aceflow.config;
 
 import kz.aceflow.interceptor.AuthInterceptor;
 import kz.aceflow.interceptor.LocaleInterceptor;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -45,17 +46,18 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public SpringTemplateEngine templateEngine() {
+    public SpringTemplateEngine templateEngine(MessageSource messageSource) {
         SpringTemplateEngine engine = new SpringTemplateEngine();
         engine.setTemplateResolver(templateResolver());
+        engine.setTemplateEngineMessageSource(messageSource);
         engine.setEnableSpringELCompiler(true);
         return engine;
     }
 
     @Bean
-    public ThymeleafViewResolver viewResolver() {
+    public ThymeleafViewResolver viewResolver(SpringTemplateEngine templateEngine) {
         ThymeleafViewResolver resolver = new ThymeleafViewResolver();
-        resolver.setTemplateEngine(templateEngine());
+        resolver.setTemplateEngine(templateEngine);
         resolver.setCharacterEncoding("UTF-8");
         resolver.setOrder(1);
         return resolver;

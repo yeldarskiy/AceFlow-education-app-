@@ -1,2 +1,15 @@
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/dao/AbstractDaoTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/dao/AchievementDaoTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/dao/DocumentDaoTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/dao/FlashcardDaoTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/dao/GoalDaoTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/dao/StudyPlanDaoTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/dao/TestDaoTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/dao/UserDaoTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/service/AchievementServiceTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/service/DocumentServiceTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/service/FlashcardServiceTest.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/service/GoalServiceTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/service/StudyPlanServiceTest.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/service/TestServiceTest.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/test/java/kz/aceflow/service/UserServiceTest.java

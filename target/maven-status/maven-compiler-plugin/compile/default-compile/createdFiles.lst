@@ -1,3 +1,4 @@
+kz/aceflow/service/impl/StudyPlanServiceImpl.class
 kz/aceflow/controller/AuthController$RegisterForm.class
 kz/aceflow/dao/StudyPlanDao.class
 kz/aceflow/service/TestService.class
@@ -13,13 +14,17 @@ kz/aceflow/model/Flashcard.class
 kz/aceflow/dao/AchievementDao.class
 kz/aceflow/config/WebConfig.class
 kz/aceflow/dao/GoalDao.class
+kz/aceflow/service/impl/AchievementServiceImpl.class
 kz/aceflow/controller/TestController.class
 kz/aceflow/service/FlashcardService.class
+kz/aceflow/dao/impl/AchievementDaoImpl.class
+kz/aceflow/service/StudyPlanService.class
 kz/aceflow/service/impl/DocumentServiceImpl.class
 kz/aceflow/dao/TestDao.class
 kz/aceflow/model/StudyPlan.class
 kz/aceflow/dao/UserDao.class
 kz/aceflow/util/ConnectionPool.class
+kz/aceflow/service/AchievementService.class
 kz/aceflow/dao/impl/TestDaoImpl.class
 kz/aceflow/controller/DashboardController.class
 kz/aceflow/model/TestResult.class
@@ -30,6 +35,7 @@ kz/aceflow/dao/DocumentDao.class
 kz/aceflow/controller/AuthController.class
 kz/aceflow/model/Achievement.class
 kz/aceflow/exception/ResourceNotFoundException.class
+kz/aceflow/dao/impl/StudyPlanDaoImpl.class
 kz/aceflow/model/Question.class
 kz/aceflow/dao/impl/DocumentDaoImpl.class
 kz/aceflow/config/AppConfig.class

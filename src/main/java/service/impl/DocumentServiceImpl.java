@@ -79,4 +79,9 @@ public class DocumentServiceImpl implements DocumentService {
     public List<Document> getDocumentsByUserId(int userId, int page, int pageSize) {
         return documentDao.findByUserId(userId, page, pageSize);
     }
+
+    @Override
+    public int countByUserId(int userId) {
+        return documentDao.countByUserId(userId);
+    }
 }

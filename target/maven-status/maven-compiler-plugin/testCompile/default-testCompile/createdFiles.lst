@@ -1,2 +1,15 @@
+kz/aceflow/service/FlashcardServiceTest.class
+kz/aceflow/dao/AbstractDaoTest.class
 kz/aceflow/service/GoalServiceTest.class
+kz/aceflow/dao/UserDaoTest.class
+kz/aceflow/dao/GoalDaoTest.class
+kz/aceflow/dao/FlashcardDaoTest.class
+kz/aceflow/dao/DocumentDaoTest.class
+kz/aceflow/dao/StudyPlanDaoTest.class
+kz/aceflow/service/AchievementServiceTest.class
+kz/aceflow/service/DocumentServiceTest.class
+kz/aceflow/dao/TestDaoTest.class
 kz/aceflow/service/UserServiceTest.class
+kz/aceflow/dao/AchievementDaoTest.class
+kz/aceflow/service/StudyPlanServiceTest.class
+kz/aceflow/service/TestServiceTest.class

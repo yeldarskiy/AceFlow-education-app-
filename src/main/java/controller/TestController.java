@@ -37,7 +37,8 @@ public class TestController {
         model.addAttribute("user", user);
         model.addAttribute("tests", testService.getTestsPage(user.getUserId(), page, pageSize));
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalPages", Math.max(1, totalPages));
+        model.addAttribute("totalItems", total);
         return "tests/index";
     }
 }

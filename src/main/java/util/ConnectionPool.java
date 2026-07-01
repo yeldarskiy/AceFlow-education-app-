@@ -139,6 +139,18 @@ public final class ConnectionPool {
         pool.clear();
     }
 
+    /**
+     * Resets the singleton for isolated test runs. Test-only.
+     */
+    public static void resetForTests() {
+        synchronized (ConnectionPool.class) {
+            if (instance != null) {
+                instance.shutdown();
+                instance = null;
+            }
+        }
+    }
+
     private Connection createConnection() {
         try {
             return DriverManager.getConnection(url, username, password);

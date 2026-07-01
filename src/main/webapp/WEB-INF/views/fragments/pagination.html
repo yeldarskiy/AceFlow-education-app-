@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="pagination(baseUrl)" class="pagination" th:if="${totalPages != null and totalPages > 1}">
+    <a th:href="@{${baseUrl}(page=${currentPage > 0 ? currentPage - 1 : 0})}"
+       class="pg-btn"
+       th:classappend="${currentPage == 0} ? 'disabled'"
+       th:text="#{pagination.prev}">&laquo;</a>
+    <span class="pg-info" th:text="#{pagination.page(${currentPage + 1}, ${totalPages})}">Page 1 of 3</span>
+    <a th:href="@{${baseUrl}(page=${currentPage < totalPages - 1 ? currentPage + 1 : totalPages - 1})}"
+       class="pg-btn"
+       th:classappend="${currentPage >= totalPages - 1} ? 'disabled'"
+       th:text="#{pagination.next}">&raquo;</a>
+</div>
+</body>
+</html>
