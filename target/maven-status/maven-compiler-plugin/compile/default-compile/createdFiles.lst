@@ -22,6 +22,7 @@ kz/aceflow/service/StudyPlanService.class
 kz/aceflow/service/impl/DocumentServiceImpl.class
 kz/aceflow/dao/TestDao.class
 kz/aceflow/model/StudyPlan.class
+kz/aceflow/controller/support/ThymeleafExceptionResolver.class
 kz/aceflow/dao/UserDao.class
 kz/aceflow/util/ConnectionPool.class
 kz/aceflow/service/AchievementService.class
@@ -60,6 +61,7 @@ kz/aceflow/service/impl/FlashcardServiceImpl.class
 kz/aceflow/exception/AuthException.class
 kz/aceflow/config/WebAppInitializer.class
 kz/aceflow/controller/ErrorPageController.class
+kz/aceflow/model/PageResult.class
 kz/aceflow/service/impl/GoalServiceImpl.class
 kz/aceflow/service/UserService.class
 kz/aceflow/controller/QuizController.class

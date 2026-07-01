@@ -34,7 +34,6 @@ public class AuthController {
         this.userService = userService;
     }
 
-    // ── Login ──────────────────────────────────────────────────────────
 
     @GetMapping("/login")
     public String showLoginForm(HttpSession session, Model model) {
@@ -62,7 +61,6 @@ public class AuthController {
         }
     }
 
-    // ── Register ───────────────────────────────────────────────────────
 
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
@@ -79,13 +77,9 @@ public class AuthController {
             model.addAttribute("registerForm", form);
             return "auth/register";
         }
-        if (!form.getPassword().equals(form.getConfirmPassword())) {
-            model.addAttribute("registerForm", form);
-            model.addAttribute("passwordMismatch", true);
-            return "auth/register";
-        }
         try {
-            userService.register(form.getName(), form.getEmail(), form.getPassword());
+            userService.registerWithConfirmation(
+                    form.getName(), form.getEmail(), form.getPassword(), form.getConfirmPassword());
             redirectAttributes.addFlashAttribute("successKey", "auth.register.success");
             return "redirect:/auth/login";
         } catch (AuthException e) {
@@ -95,7 +89,6 @@ public class AuthController {
         }
     }
 
-    // ── Logout ─────────────────────────────────────────────────────────
 
     @PostMapping("/logout")
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
@@ -106,7 +99,6 @@ public class AuthController {
         return "redirect:/auth/login";
     }
 
-    // ── Inner form DTOs ─────────────────────────────────────────────────
 
     /** Login form data transfer object. */
     public static class LoginForm {

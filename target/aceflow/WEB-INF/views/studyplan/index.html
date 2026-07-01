@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Plan - AceFlow</title>
+    <title th:text="#{page.studyplan}">Study Plan - AceFlow</title>
     <link rel="stylesheet" th:href="@{/static/css/main.css}">
 </head>
 <body>
@@ -13,77 +13,105 @@
             <span class="logo-text"><span class="logo-ace">Ace</span><em class="logo-flow">Flow</em></span>
         </div>
         <div class="nav-section">
-            <div class="nav-label">Overview</div>
-            <a class="nav-item" th:href="@{/dashboard}">&#9776; Dashboard</a>
-            <a class="nav-item" th:href="@{/goals}">&#10003; Goals</a>
-            <a class="nav-item active" th:href="@{/studyplan}">&#128197; Study Plan</a>
+            <div class="nav-label" th:text="#{nav.overview}">Overview</div>
+            <a class="nav-item" th:href="@{/dashboard}" th:text="#{nav.dashboard}">Dashboard</a>
+            <a class="nav-item" th:href="@{/goals}" th:text="#{nav.goals}">Goals</a>
+            <a class="nav-item active" th:href="@{/studyplan}" th:text="#{nav.plan}">Study Plan</a>
         </div>
         <div class="nav-section">
-            <div class="nav-label">Study Tools</div>
-            <a class="nav-item" th:href="@{/documents}">&#128194; Documents</a>
-            <a class="nav-item" th:href="@{/tests}">&#9998; Tests</a>
-            <a class="nav-item" th:href="@{/flashcards}">&#9830; Flashcards</a>
+            <div class="nav-label" th:text="#{nav.tools}">Study Tools</div>
+            <a class="nav-item" th:href="@{/documents}" th:text="#{nav.documents}">Documents</a>
+            <a class="nav-item" th:href="@{/tests}" th:text="#{nav.tests}">Tests</a>
+            <a class="nav-item" th:href="@{/flashcards}" th:text="#{nav.flashcards}">Flashcards</a>
         </div>
         <div class="nav-section">
-            <div class="nav-label">Progress</div>
-            <a class="nav-item" th:href="@{/achievements}">&#9733; Achievements</a>
+            <div class="nav-label" th:text="#{nav.progress}">Progress</div>
+            <a class="nav-item" th:href="@{/achievements}" th:text="#{nav.achievements}">Achievements</a>
         </div>
         <div class="nav-footer">
             <div class="nav-user">
                 <div class="nav-avatar" th:text="${user != null ? user.initials : 'U'}">U</div>
                 <div>
                     <div class="nav-uname" th:text="${user != null ? user.name : 'User'}">User</div>
-                    <div class="nav-ulevel">Level <span th:text="${user != null ? user.level : 1}">1</span></div>
+                    <div class="nav-ulevel"><span th:text="#{common.level}">Level</span> <span th:text="${user != null ? user.level : 1}">1</span></div>
                 </div>
             </div>
             <form th:action="@{/auth/logout}" method="post" style="margin-top:8px">
-                <button type="submit" class="btn btn-ghost btn-sm" style="width:100%;color:rgba(255,255,255,.5)">Logout</button>
+                <button type="submit" class="btn btn-ghost btn-sm" style="width:100%;color:rgba(255,255,255,.5)" th:text="#{common.logout}">Logout</button>
             </form>
         </div>
     </nav>
     <div class="main">
         <header class="topbar">
-            <div class="topbar-title">Study Plan</div>
+            <div class="topbar-title" th:text="#{page.studyplan}">Study Plan</div>
+            <div th:replace="~{fragments/lang-switch :: lang-switch('/studyplan')}"></div>
             <div class="xp-pill">&#9889; <span th:text="${user != null ? user.xpPoints : 0}">0</span> XP</div>
         </header>
         <div class="content">
-            <div class="dash-hero">
+            <div th:if="${successKey}" class="alert alert-success" th:text="#{${successKey}}"></div>
+            <div th:if="${errorKey}" class="alert alert-error" th:text="#{${errorKey}}"></div>
+
+            <div th:if="${plan != null}" class="dash-hero">
                 <div>
-                    <h1>IELTS Academic</h1>
-                    <p>August 15, 2026</p>
+                    <h1 th:text="${plan.examName}">Exam</h1>
+                    <p th:text="${plan.examDate}">Date</p>
                 </div>
                 <div class="dash-xp">
-                    <div class="big">53</div>
-                    <div class="lbl">DAYS LEFT</div>
+                    <div class="big" th:text="${plan.daysRemaining}">0</div>
+                    <div class="lbl" th:text="#{plan.days.left}">DAYS LEFT</div>
                 </div>
             </div>
-            <div class="card" style="margin-top:16px;">
-                <div class="card-title">Today's Topics</div>
+            <div th:if="${plan == null}" class="card" style="text-align:center;padding:40px;margin-bottom:16px;">
+                <p style="color:var(--ink-3);" th:text="#{plan.no.active}">No active study plan.</p>
+            </div>
+
+            <div class="sec-head" style="margin-top:16px;">
+                <h2 th:text="#{plan.todays.topics}">Today's Topics</h2>
+                <button class="btn btn-primary btn-sm" onclick="openModal('modal-plan')" th:text="|+ #{plan.new}|">+ New Plan</button>
+            </div>
+            <div class="card">
                 <div class="task-item">
                     <div class="task-chk">&#9675;</div>
                     <div style="flex:1">
-                        <div class="task-name">Reading Comprehension</div>
-                        <div style="font-size:.75rem;color:var(--ink-3);">3 passages · 45 min</div>
+                        <div class="task-name" th:text="#{nav.tests}">Tests</div>
+                        <div style="font-size:.75rem;color:var(--ink-3);" th:text="#{dashboard.start.test}">Start Test</div>
                     </div>
                 </div>
                 <div class="task-item">
                     <div class="task-chk">&#9675;</div>
                     <div style="flex:1">
-                        <div class="task-name">Writing Task 2</div>
-                        <div style="font-size:.75rem;color:var(--ink-3);">Essay practice · 40 min</div>
-                    </div>
-                </div>
-                <div class="task-item">
-                    <div class="task-chk">&#9675;</div>
-                    <div style="flex:1">
-                        <div class="task-name">Vocabulary Review</div>
-                        <div style="font-size:.75rem;color:var(--ink-3);">50 words · 20 min</div>
+                        <div class="task-name" th:text="#{nav.flashcards}">Flashcards</div>
+                        <div style="font-size:.75rem;color:var(--ink-3);" th:text="#{flashcards.study}">Study Now</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<div class="modal-bg" id="modal-plan">
+    <div class="modal">
+        <div class="modal-head">
+            <h3 th:text="#{plan.new}">New Plan</h3>
+            <button class="modal-x" onclick="closeModal('modal-plan')">&times;</button>
+        </div>
+        <form th:action="@{/studyplan/create}" method="post">
+            <div class="field">
+                <label th:text="#{plan.exam.name}">Exam Name</label>
+                <input type="text" name="examName" class="auth-input" required maxlength="100">
+            </div>
+            <div class="field">
+                <label th:text="#{plan.exam.date}">Exam Date</label>
+                <input type="date" name="examDate" class="auth-input" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" onclick="closeModal('modal-plan')" th:text="#{common.cancel}">Cancel</button>
+                <button type="submit" class="btn btn-primary" th:text="#{plan.create}">Create Plan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script th:src="@{/static/js/main.js}"></script>
 </body>
 </html>

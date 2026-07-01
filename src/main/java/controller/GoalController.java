@@ -12,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -46,9 +45,7 @@ public class GoalController {
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("currentUser");
-        LocalDate deadlineDate = (deadline != null && !deadline.isBlank())
-            ? LocalDate.parse(deadline) : null;
-        goalService.createGoal(user.getUserId(), title, deadlineDate, priority);
+        goalService.createGoalFromForm(user.getUserId(), title, deadline, priority);
         redirectAttributes.addFlashAttribute("successKey", "goals.added");
         return "redirect:/goals";
     }

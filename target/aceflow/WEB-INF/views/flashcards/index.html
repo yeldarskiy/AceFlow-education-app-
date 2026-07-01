@@ -3,17 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcards - AceFlow</title>
+    <title th:text="#{page.flashcards}">Flashcards - AceFlow</title>
     <link rel="stylesheet" th:href="@{/static/css/main.css}">
     <style>
-        .fc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-bottom:20px; }
-        .fc-deck { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; cursor:pointer; transition:all .15s; text-align:center; }
-        .fc-deck:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); }
-        .fc-deck-icon { font-size:2rem; margin-bottom:8px; }
-        .fc-deck-name { font-weight:600; font-size:.88rem; margin-bottom:4px; }
-        .fc-deck-count { font-size:.75rem; color:var(--ink-3); }
-        .prog-track { height:6px; background:var(--border); border-radius:99px; overflow:hidden; margin-top:8px; }
-        .prog-fill { height:100%; border-radius:99px; background:var(--primary); }
         .stats-row { display:flex; gap:16px; margin-bottom:20px; }
         .stat-box { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; flex:1; text-align:center; }
         .stat-box .num { font-size:1.8rem; font-weight:800; }
@@ -27,70 +19,69 @@
             <span class="logo-text"><span class="logo-ace">Ace</span><em class="logo-flow">Flow</em></span>
         </div>
         <div class="nav-section">
-            <div class="nav-label">Overview</div>
-            <a class="nav-item" th:href="@{/dashboard}">&#9776; Dashboard</a>
-            <a class="nav-item" th:href="@{/goals}">&#10003; Goals</a>
-            <a class="nav-item" th:href="@{/studyplan}">&#128197; Study Plan</a>
+            <div class="nav-label" th:text="#{nav.overview}">Overview</div>
+            <a class="nav-item" th:href="@{/dashboard}" th:text="#{nav.dashboard}">Dashboard</a>
+            <a class="nav-item" th:href="@{/goals}" th:text="#{nav.goals}">Goals</a>
+            <a class="nav-item" th:href="@{/studyplan}" th:text="#{nav.plan}">Study Plan</a>
         </div>
         <div class="nav-section">
-            <div class="nav-label">Study Tools</div>
-            <a class="nav-item" th:href="@{/documents}">&#128194; Documents</a>
-            <a class="nav-item" th:href="@{/tests}">&#9998; Tests</a>
-            <a class="nav-item active" th:href="@{/flashcards}">&#9830; Flashcards</a>
+            <div class="nav-label" th:text="#{nav.tools}">Study Tools</div>
+            <a class="nav-item" th:href="@{/documents}" th:text="#{nav.documents}">Documents</a>
+            <a class="nav-item" th:href="@{/tests}" th:text="#{nav.tests}">Tests</a>
+            <a class="nav-item active" th:href="@{/flashcards}" th:text="#{nav.flashcards}">Flashcards</a>
         </div>
         <div class="nav-section">
-            <div class="nav-label">Progress</div>
-            <a class="nav-item" th:href="@{/achievements}">&#9733; Achievements</a>
+            <div class="nav-label" th:text="#{nav.progress}">Progress</div>
+            <a class="nav-item" th:href="@{/achievements}" th:text="#{nav.achievements}">Achievements</a>
         </div>
         <div class="nav-footer">
             <div class="nav-user">
                 <div class="nav-avatar" th:text="${user != null ? user.initials : 'U'}">U</div>
                 <div>
                     <div class="nav-uname" th:text="${user != null ? user.name : 'User'}">User</div>
-                    <div class="nav-ulevel">Level <span th:text="${user != null ? user.level : 1}">1</span></div>
+                    <div class="nav-ulevel"><span th:text="#{common.level}">Level</span> <span th:text="${user != null ? user.level : 1}">1</span></div>
                 </div>
             </div>
             <form th:action="@{/auth/logout}" method="post" style="margin-top:8px">
-                <button type="submit" style="width:100%;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);padding:6px;border-radius:6px;cursor:pointer;">Logout</button>
+                <button type="submit" style="width:100%;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);padding:6px;border-radius:6px;cursor:pointer;" th:text="#{common.logout}">Logout</button>
             </form>
         </div>
     </nav>
 
     <div class="main">
         <header class="topbar">
-            <div class="topbar-title">Flashcards</div>
+            <div class="topbar-title" th:text="#{flashcards.title}">Flashcards</div>
+            <div th:replace="~{fragments/lang-switch :: lang-switch('/flashcards')}"></div>
             <div class="xp-pill">&#9889; <span th:text="${user != null ? user.xpPoints : 0}">0</span> XP</div>
             <div class="streak-pill">&#128293; <span th:text="${user != null ? user.streakDays : 0}">0</span></div>
         </header>
 
         <div class="content">
             <div class="sec-head">
-                <h2>Flashcards</h2>
+                <h2 th:text="#{flashcards.title}">Flashcards</h2>
                 <div style="display:flex;gap:8px;">
-                    <a th:href="@{/flashcards/study}" class="btn btn-primary">Study Now</a>
-                    <button class="btn btn-ghost" onclick="openModal('modal-create')">+ Create Card</button>
+                    <a th:href="@{/flashcards/study}" class="btn btn-primary" th:text="#{flashcards.study}">Study Now</a>
+                    <button class="btn btn-ghost" onclick="openModal('modal-create')" th:text="|+ #{flashcards.create}|">+ Create Card</button>
                 </div>
             </div>
 
-            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${successKey}" class="alert alert-success" th:text="#{${successKey}}"></div>
 
-            <!-- Stats -->
             <div class="stats-row">
                 <div class="stat-box">
                     <div class="num" th:text="${total}">0</div>
-                    <div class="lbl">Total Cards</div>
+                    <div class="lbl" th:text="#{flashcards.total}">Total Cards</div>
                 </div>
                 <div class="stat-box">
                     <div class="num" style="color:var(--green);" th:text="${mastered}">0</div>
-                    <div class="lbl">Mastered</div>
+                    <div class="lbl" th:text="#{flashcards.mastered.label}">Mastered</div>
                 </div>
                 <div class="stat-box">
                     <div class="num" style="color:var(--primary);" th:text="${total - mastered}">0</div>
-                    <div class="lbl">To Review</div>
+                    <div class="lbl" th:text="#{flashcards.hard}">To Review</div>
                 </div>
             </div>
 
-            <!-- Cards list -->
             <div th:if="${cards != null and !#lists.isEmpty(cards)}">
                 <div class="card">
                     <div style="display:flex;flex-direction:column;gap:8px;">
@@ -101,12 +92,8 @@
                                 <div style="font-size:.78rem;color:var(--ink-3);" th:text="${card.backText}">Back</div>
                             </div>
                             <div th:if="${card.mastered}"
-                                 style="font-size:.72rem;font-weight:700;color:var(--green);background:var(--green-lt);padding:2px 8px;border-radius:20px;">
-                                Mastered
-                            </div>
-                            <div th:if="${!card.mastered}"
-                                 style="font-size:.72rem;color:var(--ink-3);"
-                                 th:text="${card.difficulty}">MEDIUM</div>
+                                 style="font-size:.72rem;font-weight:700;color:var(--green);background:var(--green-lt);padding:2px 8px;border-radius:20px;"
+                                 th:text="#{flashcards.mastered.label}">Mastered</div>
                         </div>
                     </div>
                 </div>
@@ -115,37 +102,31 @@
             <div th:if="${cards == null or #lists.isEmpty(cards)}"
                  class="card" style="text-align:center;padding:60px;">
                 <div style="font-size:3rem;margin-bottom:16px;">&#9830;</div>
-                <div style="font-weight:600;margin-bottom:8px;">No flashcards yet</div>
-                <div style="color:var(--ink-3);font-size:.85rem;margin-bottom:20px;">
-                    Create cards manually or upload a document to generate them with AI
-                </div>
-                <button class="btn btn-primary" onclick="openModal('modal-create')">+ Create First Card</button>
+                <div style="font-weight:600;margin-bottom:8px;" th:text="#{flashcards.empty}">No flashcards yet</div>
+                <button class="btn btn-primary" onclick="openModal('modal-create')" th:text="|+ #{flashcards.create}|">+ Create First Card</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Create Card Modal -->
 <div class="modal-bg" id="modal-create">
     <div class="modal">
         <div class="modal-head">
-            <h3>Create Flashcard</h3>
+            <h3 th:text="#{flashcards.create}">Create Flashcard</h3>
             <button class="modal-x" onclick="closeModal('modal-create')">&times;</button>
         </div>
         <form th:action="@{/flashcards/create}" method="post">
             <div class="field">
-                <label>Question (Front)</label>
-                <textarea name="frontText" class="auth-input" rows="3" required
-                          placeholder="e.g. What is GDP?" style="resize:vertical;"></textarea>
+                <label th:text="#{flashcards.question}">Question (Front)</label>
+                <textarea name="frontText" class="auth-input" rows="3" required style="resize:vertical;"></textarea>
             </div>
             <div class="field">
-                <label>Answer (Back)</label>
-                <textarea name="backText" class="auth-input" rows="3" required
-                          placeholder="e.g. Gross Domestic Product..." style="resize:vertical;"></textarea>
+                <label th:text="#{flashcards.answer}">Answer (Back)</label>
+                <textarea name="backText" class="auth-input" rows="3" required style="resize:vertical;"></textarea>
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn btn-ghost" onclick="closeModal('modal-create')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="button" class="btn btn-ghost" onclick="closeModal('modal-create')" th:text="#{common.cancel}">Cancel</button>
+                <button type="submit" class="btn btn-primary" th:text="#{flashcards.create}">Create</button>
             </div>
         </form>
     </div>

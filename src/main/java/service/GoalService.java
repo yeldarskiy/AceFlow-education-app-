@@ -22,6 +22,11 @@ public interface GoalService {
     Goal createGoal(int userId, String title, LocalDate deadline, String priority);
 
     /**
+     * Parses optional deadline from form input and delegates to {@link #createGoal}.
+     */
+    Goal createGoalFromForm(int userId, String title, String deadlineStr, String priority);
+
+    /**
      * Retrieves all goals for a user, ordered by completion status then deadline.
      *
      * @param userId the user's ID

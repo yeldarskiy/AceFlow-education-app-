@@ -1,11 +1,13 @@
 package kz.aceflow.config;
 
+import kz.aceflow.controller.support.ThymeleafExceptionResolver;
 import kz.aceflow.interceptor.AuthInterceptor;
 import kz.aceflow.interceptor.LocaleInterceptor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
@@ -13,6 +15,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 
+import java.util.List;
 import java.util.Locale;
 
 @Configuration
@@ -22,6 +25,16 @@ import java.util.Locale;
         "kz.aceflow.interceptor"
 })
 public class WebConfig implements WebMvcConfigurer {
+
+    @Bean
+    public ThymeleafExceptionResolver thymeleafExceptionResolver() {
+        return new ThymeleafExceptionResolver();
+    }
+
+    @Override
+    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        resolvers.add(0, thymeleafExceptionResolver());
+    }
 
     @Bean
     public AuthInterceptor authInterceptor() {

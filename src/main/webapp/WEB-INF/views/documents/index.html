@@ -63,11 +63,11 @@
         <div class="content">
             <div class="sec-head">
                 <h2 th:text="#{documents.title}">Documents</h2>
-                <button class="btn btn-primary" onclick="openModal('modal-upload')" th:text="'+ ' + #{documents.upload}">+ Upload</button>
+                <button class="btn btn-primary" onclick="openModal('modal-upload')" th:text="|+ #{documents.upload}|">+ Upload</button>
             </div>
 
-            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-            <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+            <div th:if="${successKey}" class="alert alert-success" th:text="#{${successKey}}"></div>
+            <div th:if="${errorKey}" class="alert alert-error" th:text="#{${errorKey}}"></div>
 
             <div class="upload-zone" onclick="openModal('modal-upload')">
                 <div style="font-size:2.5rem;margin-bottom:12px;color:var(--primary);">&#8679;</div>
@@ -87,7 +87,17 @@
             <div th:if="${documents == null or #lists.isEmpty(documents)}" class="card" style="text-align:center;padding:40px;">
                 <p style="color:var(--ink-3);" th:text="#{documents.empty}">No documents yet.</p>
             </div>
-            <div th:replace="~{fragments/pagination :: pagination('/documents')}"></div>
+            <div class="pagination" th:if="${totalPages != null and totalPages > 1}">
+                <a th:href="@{/documents(page=${currentPage > 0 ? currentPage - 1 : 0})}"
+                   class="pg-btn"
+                   th:classappend="${currentPage == 0} ? 'disabled'"
+                   th:text="#{pagination.prev}">&laquo;</a>
+                <span class="pg-info" th:text="#{pagination.page(${currentPage + 1}, ${totalPages})}">Page 1 of 3</span>
+                <a th:href="@{/documents(page=${currentPage < totalPages - 1 ? currentPage + 1 : totalPages - 1})}"
+                   class="pg-btn"
+                   th:classappend="${currentPage >= totalPages - 1} ? 'disabled'"
+                   th:text="#{pagination.next}">&raquo;</a>
+            </div>
         </div>
     </div>
 </div>

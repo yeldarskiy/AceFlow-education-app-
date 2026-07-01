@@ -129,26 +129,40 @@ public final class ConnectionPool {
      */
     public void shutdown() {
         log.info("Shutting down ConnectionPool...");
-        pool.forEach(conn -> {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                log.error("Error closing connection during shutdown", e);
+        synchronized (ConnectionPool.class) {
+            if (instance == null) {
+                return;
             }
-        });
-        pool.clear();
+            pool.forEach(conn -> {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    log.error("Error closing connection during shutdown", e);
+                }
+            });
+            pool.clear();
+            instance = null;
+            log.info("ConnectionPool shut down");
+        }
+    }
+
+    /**
+     * Shuts down the pool if it was initialized. Safe to call on context destroy
+     * without accidentally creating a new pool via {@link #getInstance()}.
+     */
+    public static void shutdownIfInitialized() {
+        synchronized (ConnectionPool.class) {
+            if (instance != null) {
+                instance.shutdown();
+            }
+        }
     }
 
     /**
      * Resets the singleton for isolated test runs. Test-only.
      */
     public static void resetForTests() {
-        synchronized (ConnectionPool.class) {
-            if (instance != null) {
-                instance.shutdown();
-                instance = null;
-            }
-        }
+        shutdownIfInitialized();
     }
 
     private Connection createConnection() {

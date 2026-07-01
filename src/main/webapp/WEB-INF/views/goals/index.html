@@ -47,7 +47,7 @@
         <div class="content">
             <div class="sec-head">
                 <h2 th:text="#{goals.title}">Goals</h2>
-                <button class="btn btn-primary btn-sm" onclick="openModal('modal-goal')" th:text="'+ ' + #{goals.add}">+ Add Goal</button>
+                <button class="btn btn-primary btn-sm" onclick="openModal('modal-goal')" th:text="|+ #{goals.add}|">+ Add Goal</button>
             </div>
 
             <div th:if="${successKey}" class="alert alert-success" th:text="#{${successKey}}"></div>

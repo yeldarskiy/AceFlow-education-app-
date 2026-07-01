@@ -58,6 +58,14 @@ public class StudyPlanServiceImpl implements StudyPlanService {
     }
 
     @Override
+    public StudyPlan createPlanFromForm(int userId, String examName, String examType, String examDateStr) {
+        if (examDateStr == null || examDateStr.isBlank()) {
+            throw new IllegalArgumentException("validation.exam.date.required");
+        }
+        return createPlan(userId, examName, examType, LocalDate.parse(examDateStr));
+    }
+
+    @Override
     public void deletePlan(int planId, int userId) {
         StudyPlan plan = studyPlanDao.findById(planId)
                 .orElseThrow(() -> new ResourceNotFoundException("StudyPlan", planId));

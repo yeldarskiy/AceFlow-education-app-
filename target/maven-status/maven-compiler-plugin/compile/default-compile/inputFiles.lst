@@ -13,6 +13,7 @@
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/QuizController.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/StudyPlanController.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/TestController.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/controller/support/ThymeleafExceptionResolver.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/dao/AchievementDao.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/dao/DocumentDao.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/dao/FlashcardDao.java
@@ -40,6 +41,7 @@
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/model/Document.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/model/Flashcard.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/model/Goal.java
+/Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/model/PageResult.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/model/Question.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/model/StudyPlan.java
 /Users/yeldarskiy/IdeaProjects/AceFlow-education-app-/src/main/java/model/Test.java

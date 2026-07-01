@@ -17,5 +17,10 @@ public interface StudyPlanService {
 
     StudyPlan createPlan(int userId, String examName, String examType, LocalDate examDate);
 
+    /**
+     * Parses exam date from form input and delegates to {@link #createPlan}.
+     */
+    StudyPlan createPlanFromForm(int userId, String examName, String examType, String examDateStr);
+
     void deletePlan(int planId, int userId);
 }

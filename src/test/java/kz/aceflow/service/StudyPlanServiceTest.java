@@ -70,6 +70,26 @@ class StudyPlanServiceTest {
     }
 
     @Test
+    @DisplayName("createPlanFromForm: parses date string")
+    void createPlanFromForm_shouldParseDate() {
+        when(studyPlanDao.save(any(StudyPlan.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        StudyPlan result = studyPlanService.createPlanFromForm(
+                1, "IELTS", "LANGUAGE", LocalDate.now().plusMonths(1).toString());
+
+        assertEquals("IELTS", result.getExamName());
+    }
+
+    @Test
+    @DisplayName("createPlanFromForm: throws when date blank")
+    void createPlanFromForm_shouldThrow_whenDateBlank() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> studyPlanService.createPlanFromForm(1, "IELTS", null, ""));
+
+        assertEquals("validation.exam.date.required", ex.getMessage());
+    }
+
+    @Test
     @DisplayName("deletePlan: deletes when owner")
     void deletePlan_shouldDelete_whenOwner() {
         StudyPlan plan = new StudyPlan();

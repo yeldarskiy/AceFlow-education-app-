@@ -91,6 +91,29 @@ class UserServiceTest {
         assertEquals("STUDENT", result.getRole());
     }
 
+    @Test
+    @DisplayName("registerWithConfirmation: should delegate when passwords match")
+    void registerWithConfirmation_shouldRegister_whenPasswordsMatch() {
+        when(userDao.existsByEmail(anyString())).thenReturn(false);
+        when(userDao.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        User result = userService.registerWithConfirmation(
+                "Yeldar", "yeldar@example.kz", "password123", "password123");
+
+        assertEquals("yeldar@example.kz", result.getEmail());
+    }
+
+    @Test
+    @DisplayName("registerWithConfirmation: should throw when passwords mismatch")
+    void registerWithConfirmation_shouldThrow_whenPasswordsMismatch() {
+        AuthException ex = assertThrows(AuthException.class,
+                () -> userService.registerWithConfirmation(
+                        "Yeldar", "yeldar@example.kz", "password123", "different"));
+
+        assertEquals("validation.password.mismatch", ex.getMessage());
+        verify(userDao, never()).save(any());
+    }
+
     // ── Login tests ────────────────────────────────────────────────────
 
     @Test

@@ -2,8 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, i
-nitial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title th:text="#{nav.dashboard}">Dashboard - AceFlow</title>
 <link rel="stylesheet" th:href="@{/static/css/main.css}">
 </head>
@@ -16,9 +15,8 @@ nitial-scale=1.0">
     <div class="nav-section">
       <div class="nav-label" th:text="#{nav.overview}">Overview</div>
       <a class="nav-item active" th:href="@{/dashboard}" th:text="#{nav.dashboard}">Dashboard</a>
-      <a class="nav-item" th:href="@{/goals}" th:text="#{nav.go
-
-    als}">Goals</a>
+      <a class="nav-item" th:href="@{/goals}" th:text="#{nav.goals}">Goals</a>
+      <a class="nav-item" th:href="@{/studyplan}" th:text="#{nav.plan}">Study Plan</a>
     </div>
     <div class="nav-section">
       <div class="nav-label" th:text="#{nav.tools}">Tools</div>
@@ -34,7 +32,7 @@ nitial-scale=1.0">
         </div>
       </div>
       <form th:action="@{/auth/logout}" method="post" style="margin-top:8px">
-        <button type="submit" class="btn btn-ghost btn-sm" style="width:100%;color:rgba(255,255,255,.5)">Logout</button>
+        <button type="submit" class="btn btn-ghost btn-sm" style="width:100%;color:rgba(255,255,255,.5)" th:text="#{common.logout}">Logout</button>
       </form>
     </div>
   </nav>

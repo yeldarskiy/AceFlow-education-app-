@@ -29,16 +29,13 @@ public class TestController {
     public String listTests(@RequestParam(defaultValue = "0") int page,
                             HttpSession session, Model model) {
         User user = (User) session.getAttribute("currentUser");
-        int pageSize = 10;
-
-        int total = testService.countAllTests();
-        int totalPages = (int) Math.ceil((double) total / pageSize);
+        var result = testService.getTestsPageResult(user.getUserId(), page, 10);
 
         model.addAttribute("user", user);
-        model.addAttribute("tests", testService.getTestsPage(user.getUserId(), page, pageSize));
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", Math.max(1, totalPages));
-        model.addAttribute("totalItems", total);
+        model.addAttribute("tests", result.items());
+        model.addAttribute("currentPage", result.currentPage());
+        model.addAttribute("totalPages", result.totalPages());
+        model.addAttribute("totalItems", result.totalItems());
         return "tests/index";
     }
 }

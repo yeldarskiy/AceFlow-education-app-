@@ -74,7 +74,7 @@
                     <div class="test-info">
                         <div class="test-name" th:text="${test.title}">Test</div>
                         <div class="test-meta">
-                            <span th:text="${test.timeLimit} + ' ' + #{tests.min}">30 min</span>
+                            <span th:text="|${test.timeLimit} #{tests.min}|">30 min</span>
                             <span class="badge"
                                   th:classappend="${test.difficulty == 'HARD'} ? 'badge-red' : (${test.difficulty == 'EASY'} ? 'badge-green' : 'badge-gold')"
                                   th:text="${test.difficulty}">Medium</span>
@@ -86,14 +86,24 @@
                              th:classappend="${test.scoreLabel}"
                              th:text="${test.bestScore} + '%'">85%</div>
                         <div th:if="${test.bestScore == null}" class="test-score-val new" th:text="#{tests.no.score}">New</div>
-                        <div style="font-size:.7rem;color:var(--ink-3);" th:text="${test.bestScore != null ? #{tests.score.best} : ''}"></div>
+                        <div th:if="${test.bestScore != null}" style="font-size:.7rem;color:var(--ink-3);" th:text="#{tests.score.best}">Best</div>
                     </div>
                 </a>
                 <div th:if="${tests == null or #lists.isEmpty(tests)}" class="card" style="text-align:center;padding:40px;">
                     <p style="color:var(--ink-3);" th:text="#{common.no.tests}">No tests available yet.</p>
                 </div>
             </div>
-            <div th:replace="~{fragments/pagination :: pagination('/tests')}"></div>
+            <div class="pagination" th:if="${totalPages != null and totalPages > 1}">
+                <a th:href="@{/tests(page=${currentPage > 0 ? currentPage - 1 : 0})}"
+                   class="pg-btn"
+                   th:classappend="${currentPage == 0} ? 'disabled'"
+                   th:text="#{pagination.prev}">&laquo;</a>
+                <span class="pg-info" th:text="#{pagination.page(${currentPage + 1}, ${totalPages})}">Page 1 of 3</span>
+                <a th:href="@{/tests(page=${currentPage < totalPages - 1 ? currentPage + 1 : totalPages - 1})}"
+                   class="pg-btn"
+                   th:classappend="${currentPage >= totalPages - 1} ? 'disabled'"
+                   th:text="#{pagination.next}">&raquo;</a>
+            </div>
         </div>
     </div>
 </div>

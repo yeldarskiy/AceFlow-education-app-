@@ -9,8 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
-
 @Controller
 @RequestMapping("/studyplan")
 public class StudyPlanController {
@@ -40,7 +38,7 @@ public class StudyPlanController {
                              RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("currentUser");
         try {
-            studyPlanService.createPlan(user.getUserId(), examName, examType, LocalDate.parse(examDate));
+            studyPlanService.createPlanFromForm(user.getUserId(), examName, examType, examDate);
             redirectAttributes.addFlashAttribute("successKey", "plan.created.success");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorKey", e.getMessage());

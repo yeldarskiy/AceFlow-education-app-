@@ -86,6 +86,13 @@ input, select, textarea { font-family: var(--font); } ul, ol { list-style: none;
 .lang-switch .lang-btn { padding: 4px 8px; font-size: .72rem; border: none; border-right: 1px solid var(--border); border-radius: 0; }
 .lang-switch .lang-btn:last-child { border-right: none; }
 
+/* ── Pagination ── */
+.pagination { display: flex; align-items: center; gap: 8px; justify-content: center; margin-top: 20px; }
+.pg-btn { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: .8rem; font-weight: 600; color: var(--ink-2); background: var(--card); cursor: pointer; text-decoration: none; }
+.pg-btn:hover:not(.disabled) { background: var(--primary-lt); border-color: var(--primary); color: var(--primary); }
+.pg-btn.disabled { opacity: .4; pointer-events: none; cursor: default; }
+.pg-info { font-size: .8rem; color: var(--ink-3); padding: 0 8px; }
+
 .goals-list { display: flex; flex-direction: column; gap: 8px; }
 .goal-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; }
 .goal-chk { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 6px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: .65rem; }

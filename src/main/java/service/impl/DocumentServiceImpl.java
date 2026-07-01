@@ -2,6 +2,7 @@ package kz.aceflow.service.impl;
 
 import kz.aceflow.dao.DocumentDao;
 import kz.aceflow.model.Document;
+import kz.aceflow.model.PageResult;
 import kz.aceflow.service.DocumentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,13 @@ public class DocumentServiceImpl implements DocumentService {
             log.error("Upload failed for user {}", userId, e);
             throw new RuntimeException("Failed to store uploaded file", e);
         }
+    }
+
+    @Override
+    public PageResult<Document> getDocumentsPage(int userId, int page, int pageSize) {
+        int total = countByUserId(userId);
+        List<Document> documents = getDocumentsByUserId(userId, page, pageSize);
+        return PageResult.of(documents, page, pageSize, total);
     }
 
     @Override

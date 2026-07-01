@@ -67,7 +67,7 @@
 
             <div class="sec-head" style="margin-top:16px;">
                 <h2 th:text="#{plan.todays.topics}">Today's Topics</h2>
-                <button class="btn btn-primary btn-sm" onclick="openModal('modal-plan')" th:text="'+ ' + #{plan.new}">+ New Plan</button>
+                <button class="btn btn-primary btn-sm" onclick="openModal('modal-plan')" th:text="|+ #{plan.new}|">+ New Plan</button>
             </div>
             <div class="card">
                 <div class="task-item">

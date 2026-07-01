@@ -43,6 +43,13 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
+    public Goal createGoalFromForm(int userId, String title, String deadlineStr, String priority) {
+        LocalDate deadline = (deadlineStr != null && !deadlineStr.isBlank())
+                ? LocalDate.parse(deadlineStr) : null;
+        return createGoal(userId, title, deadline, priority);
+    }
+
+    @Override
     public List<Goal> getGoalsByUserId(int userId) {
         return goalDao.findByUserId(userId);
     }

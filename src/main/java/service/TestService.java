@@ -1,5 +1,6 @@
 package kz.aceflow.service;
 
+import kz.aceflow.model.PageResult;
 import kz.aceflow.model.Test;
 
 import java.util.List;
@@ -11,14 +12,10 @@ import java.util.Map;
 public interface TestService {
 
     /**
-     * Returns a page of tests, each annotated with the requesting user's
-     * best score (if any), ready for the view to render directly.
-     *
-     * @param userId   the user requesting the list, used to attach best scores
-     * @param page     zero-based page index
-     * @param pageSize number of tests per page
-     * @return list of tests for the requested page
+     * Returns a paginated list of tests with best-score metadata for the view.
      */
+    PageResult<Test> getTestsPageResult(int userId, int page, int pageSize);
+
     List<Test> getTestsPage(int userId, int page, int pageSize);
 
     /**

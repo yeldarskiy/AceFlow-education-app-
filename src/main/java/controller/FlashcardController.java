@@ -58,7 +58,7 @@ public class FlashcardController {
                              RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("currentUser");
         flashcardService.createCard(user.getUserId(), frontText, backText);
-        redirectAttributes.addFlashAttribute("successMessage", "Flashcard created!");
+        redirectAttributes.addFlashAttribute("successKey", "flashcards.created.success");
         return "redirect:/flashcards";
     }
 }

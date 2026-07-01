@@ -54,6 +54,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User registerWithConfirmation(String name, String email, String password, String confirmPassword) {
+        if (password == null || !password.equals(confirmPassword)) {
+            throw new AuthException("validation.password.mismatch");
+        }
+        return register(name, email, password);
+    }
+
+    @Override
     public User login(String email, String password) {
         Optional<User> userOpt = userDao.findByEmail(email);
         if (userOpt.isEmpty()) {

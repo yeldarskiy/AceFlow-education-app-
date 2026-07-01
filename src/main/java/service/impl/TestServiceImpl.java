@@ -4,6 +4,7 @@ import kz.aceflow.dao.QuestionDao;
 import kz.aceflow.dao.TestDao;
 import kz.aceflow.dao.TestResultDao;
 import kz.aceflow.exception.ResourceNotFoundException;
+import kz.aceflow.model.PageResult;
 import kz.aceflow.model.Question;
 import kz.aceflow.model.Test;
 import kz.aceflow.model.TestResult;
@@ -39,6 +40,13 @@ public class TestServiceImpl implements TestService {
         this.testDao = testDao;
         this.testResultDao = testResultDao;
         this.questionDao = questionDao;
+    }
+
+    @Override
+    public PageResult<Test> getTestsPageResult(int userId, int page, int pageSize) {
+        int total = countAllTests();
+        List<Test> tests = getTestsPage(userId, page, pageSize);
+        return PageResult.of(tests, page, pageSize, total);
     }
 
     @Override

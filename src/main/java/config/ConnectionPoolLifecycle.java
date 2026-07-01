@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  * The pool itself is a manually-managed singleton (per the no-ORM / custom-pool
  * requirement), so Spring cannot construct or own it directly via {@code @Component}.
  * This bean exists purely so Spring's container lifecycle can call
- * {@link ConnectionPool#shutdown()} automatically when the web application
+ * {@link ConnectionPool#shutdownIfInitialized()} automatically when the web application
  * context is destroyed — i.e. when Tomcat undeploys or stops this app —
  * without needing a raw JVM shutdown hook.
  * <p>
@@ -43,6 +43,6 @@ public class ConnectionPoolLifecycle {
      */
     public void destroy() {
         log.info("Application context closing — shutting down ConnectionPool");
-        ConnectionPool.getInstance().shutdown();
+        ConnectionPool.shutdownIfInitialized();
     }
 }

@@ -23,6 +23,13 @@ public interface UserService {
     User register(String name, String email, String password);
 
     /**
+     * Validates password confirmation before delegating to {@link #register}.
+     *
+     * @throws AuthException with i18n key if passwords do not match
+     */
+    User registerWithConfirmation(String name, String email, String password, String confirmPassword);
+
+    /**
      * Authenticates a user by verifying their password against the stored hash.
      *
      * @param email    the user's email address
